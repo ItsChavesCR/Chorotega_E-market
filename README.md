@@ -1,61 +1,81 @@
-Chortega E-Market — Frontend (Next.js)
+# Chortega E-Market — Frontend (Next.js)
 
-Marketplace comunitario para conectar emprendedores, clientes y repartidores de Nicoya. Este repo contiene la app web (SSR/SPA) construida con Next.js (App Router) + TypeScript + Tailwind + shadcn/ui y Zustand para estado. La app consume una API NestJS y usa Socket.IO para tiempo real (chat y estados de pedido).
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.0-38bdf8?logo=tailwindcss)](https://tailwindcss.com/)
+[![Vercel](https://img.shields.io/badge/Deploy-Vercel-black?logo=vercel)](https://vercel.com/)
 
-🔍 Objetivo
+Marketplace comunitario para conectar emprendedores, clientes y repartidores de Nicoya. Este repositorio contiene la aplicación web (SSR/SPA) construida con Next.js (App Router) + TypeScript + Tailwind + shadcn/ui y Zustand para estado. La app consume una API NestJS y usa Socket.IO para comunicación en tiempo real.
 
-Ofrecer una interfaz rápida, accesible y responsiva para: explorar catálogo, realizar pedidos, chatear en tiempo real y seguir el estado de las entregas. Basado en las especificaciones académicas del proyecto final (UNA) y el alcance del MVP.
+## 🔍 Objetivo
 
-🚀 Stack técnico
+Ofrecer una interfaz rápida, accesible y responsiva para:
+- 🛍️ Explorar catálogo de productos
+- 📦 Realizar pedidos
+- 💬 Chat en tiempo real
+- 📍 Seguimiento de entregas
 
-Framework: Next.js (App Router) + React 18 + TypeScript
+Basado en las especificaciones académicas del proyecto final (UNA) y el alcance del MVP.
 
-UI: Tailwind CSS + shadcn/ui + Lucide Icons
+## 🚀 Stack Técnico
 
-Estado: Zustand (slices por dominio: auth, cart, orders, chat)
+| Categoría | Tecnología |
+|-----------|------------|
+| **Framework** | Next.js (App Router) + React 18 + TypeScript |
+| **UI/Styling** | Tailwind CSS + shadcn/ui + Lucide Icons |
+| **Estado** | Zustand (slices por dominio: auth, cart, orders, chat) |
+| **Tiempo Real** | Socket.IO client (WebSocket) |
+| **Peticiones** | fetch/React Query (opcional) |
+| **Imágenes** | next/image + dominios permitidos (CDN/S3) |
+| **Calidad** | ESLint + Prettier + Husky + lint-staged |
+| **Testing** | Playwright E2E + Testing Library (opcional) |
+| **Accesibilidad** | aria-*, contraste, navegación por teclado |
+| **Deploy** | Vercel (preview + prod), CI/CD con GitHub Actions |
 
-Tiempo real: Socket.IO client (WS)
+## 🗺️ Módulos del Frontend (MVP)
 
-Peticiones: fetch/React Query (opcional)
+### 🔐 Auth & Perfil
+- Registro/login con roles (Cliente/Emprendedor/Repartidor/Admin)
+- Edición de perfil de usuario
 
-Imágenes: next/image + dominios permitidos (CDN/S3)
+### 📋 Catálogo
+- Listado y detalle de productos
+- Búsqueda y filtros por categorías
+- Carrito de compras y checkout
 
-Calidad: ESLint + Prettier + Husky + lint-staged
+### 📦 Pedidos
+- Creación de pedidos
+- Tracking de estados: `confirmado` → `en preparación` → `en camino` → `entregado`
 
-Pruebas: Playwright E2E (y Testing Library opcional)
+### 🚚 Repartidores
+- Vista de pedidos disponibles
+- Flujo de aceptación de entregas
 
-Accesibilidad: aria-*, contraste, navegación por teclado
+### 💬 Chat
+- Conversaciones Cliente ↔ Emprendedor
+- Conversaciones Cliente ↔ Repartidor
+- Comunicación en tiempo real con Socket.IO
 
-Deploy: Vercel (preview + prod), CI/CD con GitHub Actions
+### ⚙️ Admin (Básico)
+- CRUD de usuarios y contenido
+- Panel de administración mínimo
 
+### 🔔 Notificaciones
+- Timeline in-app de cambios de estado
+- Notificaciones en tiempo real
 
-🗺️ Módulos del Frontend (MVP)
+## 📁 Estructura de Carpetas
 
-Auth & Perfil: registro/login, rol (Cliente/Emprendedor/Repartidor/Admin), edición de perfil.
-
-Catálogo: listado, detalle, búsqueda, categorías, carrito, checkout.
-
-Pedidos: creación, tracking de estados (confirmado → en preparación → en camino → entregado).
-
-Repartidores: ver pedidos disponibles y aceptar entregas (flujo básico).
-
-Chat: conversaciones Cliente↔Emprendedor y Cliente↔Repartidor (Socket.IO).
-
-Admin (mínimo): CRUD básico de usuarios/contenido visible.
-
-Notificaciones in-app: timeline de cambios de estado.
-
-
-📁 Estructura de carpetas (sugerida)
+```
 /src
   /app
     /(public)          # rutas públicas (home, login, registro, catálogo)
     /(private)         # rutas protegidas por rol
-    /api               # acciones server-only (Next.js server actions opcional)
-    /orders
-    /products
-    /chat
-    /dashboard
+    /api               # acciones server-only (Next.js server actions)
+    /orders            # páginas de pedidos
+    /products          # páginas de productos
+    /chat              # páginas de chat
+    /dashboard         # dashboards por rol
     layout.tsx
     globals.css
   /components
@@ -68,25 +88,24 @@ Notificaciones in-app: timeline de cambios de estado.
   /hooks               # useAuth, useSocket, useRole, etc.
   /lib                 # fetcher, socket, constants, utils (money, dates)
   /stores              # Zustand slices (authSlice, cartSlice, chatSlice...)
-  /types               # DTOs/Types compartidos con backend si aplica
+  /types               # DTOs/Types compartidos con backend
   /styles              # estilos adicionales
-  /tests-e2e           # Playwright
+  /tests-e2e           # Playwright tests
+```
 
-🔧 Requisitos
+## 🔧 Requisitos
 
-Node 18+
+- **Node.js** 18+
+- **pnpm** (`npm i -g pnpm`)
+- Cuenta de **Vercel** para deploy
+- **API NestJS** accesible (local/Render)
+- Servidor **Socket.IO** configurado
 
-pnpm npm i -g pnpm
+## ⚙️ Variables de Entorno
 
-Cuenta de Vercel (deploy)
+Crea un archivo `.env.local`:
 
-API NestJS accesible (local/Render) y servidor Socket.IO
-
-
-⚙️ Variables de entorno
-
-Crea un .env.local:
-
+```bash
 # API & Realtime
 NEXT_PUBLIC_API_BASE_URL=https://api.example.com
 NEXT_PUBLIC_SOCKET_URL=wss://api.example.com
@@ -95,64 +114,90 @@ NEXT_PUBLIC_SOCKET_URL=wss://api.example.com
 NEXT_PUBLIC_IMAGE_BASE=https://cdn.example.com
 
 # Auth (si se usa OAuth en frontend)
-NEXT_PUBLIC_GOOGLE_CLIENT_ID=
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_client_id
+```
 
+> **Nota**: Ajusta dominios permitidos para `next/image` en `next.config.js` y CORS en el backend.
 
-Ajusta dominios permitidos para next/image en next.config.js y CORS en el backend.
+## ▶️ Scripts
 
-▶️ Scripts
-pnpm i                # instalar dependencias
-pnpm dev              # entorno local (http://localhost:3000)
-pnpm build            # compilar para producción
-pnpm start            # servir build (Node)
-pnpm lint             # lint
-pnpm format           # prettier
-pnpm test:e2e         # playwright
+```bash
+pnpm i                # Instalar dependencias
+pnpm dev              # Entorno local (http://localhost:3000)
+pnpm build            # Compilar para producción
+pnpm start            # Servir build (Node)
+pnpm lint             # Linting
+pnpm format           # Formatear código con Prettier
+pnpm test:e2e         # Pruebas E2E con Playwright
+```
 
-🔐 Rutas por rol (guardas)
+## 🔐 Rutas por Rol
 
-Públicas: /, /login, /register, /products, /products/[id]
+### 🌍 Públicas
+- `/` - Página de inicio
+- `/login` - Iniciar sesión
+- `/register` - Registro
+- `/products` - Catálogo
+- `/products/[id]` - Detalle de producto
 
-Cliente: /orders, /orders/[id], /chat
+### 👤 Cliente
+- `/orders` - Mis pedidos
+- `/orders/[id]` - Detalle de pedido
+- `/chat` - Conversaciones
 
-Emprendedor: /dashboard/entrepreneur, /dashboard/products
+### 🏪 Emprendedor
+- `/dashboard/entrepreneur` - Panel de emprendedor
+- `/dashboard/products` - Gestión de productos
 
-Repartidor: /dashboard/courier, /deliveries
+### 🚚 Repartidor
+- `/dashboard/courier` - Panel de repartidor
+- `/deliveries` - Entregas disponibles
 
-Admin: /admin (gestión mínima)
-Los layouts de App Router aplican guards de rol a nivel de segmento.
+### 👑 Admin
+- `/admin` - Panel de administración
 
-🔌 Integración con la API
+> Los layouts de App Router aplican guards de rol a nivel de segmento.
 
-Convenciones:
+## 🔌 Integración con la API
 
-REST base: ${NEXT_PUBLIC_API_BASE_URL}
+### Convenciones REST
 
-Auth: /auth/login, /auth/register, refresh token en cookies/httpOnly
+| Endpoint | Descripción |
+|----------|-------------|
+| **Base** | `${NEXT_PUBLIC_API_BASE_URL}` |
+| **Auth** | `/auth/login`, `/auth/register` |
+| **Catálogo** | `/products`, `/categories` |
+| **Pedidos** | `/orders`, `/orders/:id/status` |
+| **Chat** | `/conversations`, `/messages` |
 
-Catálogo: /products, /categories
+### Ejemplo de Cliente API
 
-Pedidos: /orders, /orders/:id/status
-
-Chat: WS en ${NEXT_PUBLIC_SOCKET_URL} y REST /conversations, /messages
-
-Eventos WS: order:status, order:assigned, chat:message
-
-
-Ejemplo de cliente simple:
-
+```typescript
 // src/lib/fetcher.ts
 export async function api<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${path}`, {
     credentials: 'include',
     ...init,
-    headers: { 'Content-Type': 'application/json', ...(init?.headers || {}) },
+    headers: { 
+      'Content-Type': 'application/json', 
+      ...(init?.headers || {}) 
+    },
   });
+  
   if (!res.ok) throw new Error(await res.text());
   return res.json() as Promise<T>;
 }
+```
 
-💬 Socket.IO (cliente)
+### Eventos WebSocket
+
+- `order:status` - Cambio de estado de pedido
+- `order:assigned` - Asignación de pedido
+- `chat:message` - Nuevo mensaje de chat
+
+## 💬 Socket.IO (Cliente)
+
+```typescript
 // src/lib/socket.ts
 import { io } from 'socket.io-client';
 
@@ -165,61 +210,93 @@ export function connectSocket(token?: string) {
   if (token) socket.auth = { token };
   if (!socket.connected) socket.connect();
 }
+```
 
+## 🧰 UI & Diseño
 
-Suscripción en componentes de chat/órdenes para actualizar timeline de estado.
+- **shadcn/ui** para componentes accesibles y consistentes (Button, Card, Sheet, Dialog)
+- **Tailwind CSS** con tokens de color y tipografía
+- **Soporte dark mode** (opcional)
+- **Diseño responsivo**: mobile-first con breakpoints adaptativos
+- **Accesibilidad**: roles ARIA, labels, foco visible, semántica adecuada
 
-🧰 UI & diseño
+## 🧪 Pruebas y Calidad
 
-shadcn/ui para componentes accesibles y consistentes (Button, Card, Sheet, Dialog).
+### Testing E2E (Playwright)
+Flujos críticos cubiertos:
+- ✅ Login y autenticación
+- ✅ Añadir productos al carrito
+- ✅ Proceso de checkout
+- ✅ Seguimiento de pedidos
+- ✅ Chat básico
 
-Tailwind con tokens de color y tipografía; soporte dark mode si aplica.
+### Code Quality
+- **Linting/Format**: Ejecutado en pre-commit con Husky + lint-staged
+- **Métricas**: Lighthouse (performance, accessibility, best practices)
 
-Responsivo: mobile-first, breakpoints para cards de catálogo y timeline de pedidos.
+## 🔄 CI/CD
 
-Accesibilidad: roles/labels, foco visible, semántica adecuada.
+### Vercel
+- Conecta el repositorio
+- Cada PR crea un preview deployment automático
+- Variables de entorno gestionadas en Project Settings
 
+### GitHub Actions
+```yaml
+# Ejemplo de workflow
+- pnpm install
+- pnpm build
+- pnpm test:e2e (modo CI)
+```
 
-🧪 Pruebas y calidad
+## 🗺️ Roadmap
 
-E2E (Playwright): flujos clave: login, añadir al carrito, checkout, ver estado del pedido, chat básico.
+### ✅ MVP
+- Auth + catálogo + pedidos + chat + estados + admin básico
 
-Lint/Format: se ejecutan en pre-commit con Husky + lint-staged.
+### 🚧 Futuras Mejoras
+- 💳 Integración de pagos (SINPE/TC)
+- ⭐ Sistema de reseñas
+- 📧 Notificaciones por email
+- 🗺️ Mapas por zonas de entrega
+- 🤖 Autoasignación por proximidad
+- 📊 Panel de analítica
+- 🎯 Sistema de campañas
 
-Métricas: Lighthouse (performance, a11y, best practices).
+## 🤝 Contribución
 
+### Convenciones
+- **Commits**: [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `chore:`)
+- **Branches**: `feat/<módulo>`, `fix/<área>`
+- **PRs**: Incluyen preview automático de Vercel
+- **Code Style**: Hooks de pre-commit activos
 
-🔄 CI/CD
+### Proceso
+1. Fork el repositorio
+2. Crea una rama feature: `git checkout -b feat/nueva-funcionalidad`
+3. Commit cambios: `git commit -m 'feat: agregar nueva funcionalidad'`
+4. Push a la rama: `git push origin feat/nueva-funcionalidad`
+5. Abre un Pull Request
 
-Vercel: conecta el repo; cada PR crea un preview deployment.
+## 📜 Licencia
 
-GitHub Actions: job de pnpm install, pnpm build y (opcional) pnpm test:e2e en modo CI.
+Uso académico/educativo según lineamientos del curso UNA.
 
-Variables de entorno gestionadas en Vercel Project Settings.
+---
 
-🗺️ Roadmap (frente al MVP)
+## 📝 Notas Importantes
 
-MVP: auth + catálogo + pedidos + chat + estados + admin mínimo.
+> ⚠️ **Configuración Crítica**
+> 
+> - Asegúrate de alinear CORS entre frontend y backend
+> - Configura dominios permitidos para imágenes en `next.config.js`
+> - Sincroniza URLs de Socket.IO entre cliente y servidor
+> - Revisa el cronograma y módulos priorizados para cumplir hitos semanales
 
-Pagos (SINPE/TC), reseñas, notificaciones email, mapa por zonas.
+## 🆘 Soporte
 
-Autoasignación por cercanía, optimización de rutas, campañas internas, analítica.
+Para dudas sobre el proyecto académico, consulta con el equipo docente o revisa la documentación del curso.
 
+---
 
-🤝 Convenciones & Contribución
-
-Commits: Conventional Commits (feat:, fix:, chore:…).
-
-Branches: feat/<módulo>, fix/<área>, PRs con preview de Vercel.
-
-Code style: hooks de pre-commit activos; evita push con lint roto.
-
-📜 Licencia
-
-Uso académico/educativo según lineamientos del curso. Ajustar si se publica de forma abierta.
-
-📝 Notas
-
-Asegúrate de alinear CORS, dominios de imágenes y URLs de Socket entre frontend y backend.
-
-Revisa el cronograma y los módulos priorizados para cumplir hitos semanales.
+**Desarrollado con ❤️ para la comunidad de Nicoya**
