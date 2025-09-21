@@ -20,7 +20,7 @@ export default function RegisterOptionPage() {
         </div>
 
         {/* Heading */}
-        <h1 className="mb-12 text-center text-3xl font-extrabold tracking-tight">
+        <h1 className="mb-12 text-center text-3xl font-extrabold tracking-tight sm:text-4xl text-[#202022]">
           ¿Cómo quieres registrarte?
         </h1>
 

@@ -39,7 +39,7 @@ export const Hero = () => {
           {/* Botón */}
           <div className="mt-16 flex justify-center">
             <a
-              href="/marketplace"
+              href="/auth/login"
               className="inline-flex items-center gap-2 rounded-md bg-[#326931] px-5 py-3 text-white font-semibold shadow hover:bg-[#285528] active:scale-[0.99]"
             >
               <Store className="h-5 w-5" />

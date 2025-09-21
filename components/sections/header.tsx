@@ -1,6 +1,7 @@
 import React from 'react'
 import Image from 'next/image'
 import { Store } from 'lucide-react'
+import Link from 'next/link'
 
 export const Header = () => {
   return (
@@ -13,10 +14,10 @@ export const Header = () => {
           height={48}
           className="h-32 w-28 ml-12"
         />
-        <div className='flex justify-center mr-12 gap-2 bg-[#326931] text-white px-6 py-3 rounded-md hover:bg-[#255224] cursor-pointer'>
+        <Link href="/auth/login" className='flex justify-center mr-12 gap-2 bg-[#326931] text-white px-6 py-3 rounded-md hover:bg-[#255224] cursor-pointer'>
             <Store className='size-7' />
           <p className='text-lg font-semibold'>Únete</p>
-        </div>
+        </Link>
       </header>
     </>
   )

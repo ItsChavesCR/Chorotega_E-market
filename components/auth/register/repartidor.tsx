@@ -19,7 +19,7 @@ import Link from "next/link";
 
 export default function RepartidorRegister() {
   return (
-    <main className="min-h-screen bg-neutral-100 text-neutral-900">
+    <main className="min-h-screen text-neutral-900">
       <div className="mx-auto max-w-4xl px-4 py-8 md:py-12">
         <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5 md:p-8">
           {/* Tabs */}
