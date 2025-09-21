@@ -5,7 +5,6 @@ import { Header } from "@/components/sections/header";
 import { Hero } from "@/components/sections/hero";
 import { Usability } from "@/components/sections/usability";
 
-
 export default function Home() {
   return (
     <>
