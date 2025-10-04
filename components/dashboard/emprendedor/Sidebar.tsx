@@ -44,7 +44,7 @@ const NAV: NavItem[] = [
   { href: "/dashboard/emprendedor/languages", label: "Idiomas", icon: Languages },
   { href: "/dashboard/emprendedor/help", label: "Centro de ayuda", icon: LifeBuoy },
 ];
-const LOGOUT: NavItem = { href: "/logout", label: "Logout", icon: LogOut };
+const LOGOUT: NavItem = { href: "/auth/login", label: "Logout", icon: LogOut };
 
 function NavList({ onItemClick }: { onItemClick?: () => void }) {
   const pathname = usePathname();
