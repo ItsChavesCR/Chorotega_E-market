@@ -36,7 +36,7 @@ export default function LoginForm() {
 
   return (
     <main className="min-h-screen text-neutral-900">
-      <div className="mx-auto max-w-6xl px-4 py-8 md:py-12">
+      <div className="mx-auto max-w-6xl px-4 py-2 md:py-24">
         <div className="grid gap-8 md:grid-cols-[1fr_minmax(0,_1px)_1fr]">
           {/* LEFT PANEL */}
           <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5 md:p-8">
