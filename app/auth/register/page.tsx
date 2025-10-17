@@ -1,5 +1,8 @@
 import { RoleCard } from "@/components/auth/register/option";
-import { ArrowLeft, Bike, Link, Store, UserRound } from "lucide-react";
+import { Footer } from "@/components/sections/footer";
+import { HeaderLittle } from "@/components/sections/headerLittle";
+import { ArrowLeft, Bike, Store, UserRound } from "lucide-react";
+import Link from "next/link";
 
 
 export const metadata = { title: 'Sign up — Chorotega E-Market' };
@@ -7,7 +10,8 @@ export const metadata = { title: 'Sign up — Chorotega E-Market' };
 export default function RegisterOptionPage() {
   return (
     <main className="min-h-screen bg-white text-neutral-900">
-      <div className="mx-auto max-w-5xl px-4 py-10">
+      <HeaderLittle/>
+      <div className="mx-auto max-w-5xl px-4 py-40 sm:px-6 lg:px-8">
         {/* Back */}
         <div className="mb-10 flex items-center">
           <Link
@@ -51,6 +55,7 @@ export default function RegisterOptionPage() {
           />
         </div>
       </div>
+      <Footer/>
     </main>
   );
 }
