@@ -1,31 +1,13 @@
-// ✅ Lista de categorías (sin enum). De aquí inferimos el tipo Category.
-export const CATEGORIES = [
-  "Café",
-  "Bebidas",
-  "Lácteos",
-  "Panadería",
-  "Salsas",
-  "Snacks",
-  "Cuidado personal",
-  "Otros",
-] as const;
-
-// Unión de literales: "Café" | "Bebidas" | ...
-export type Category = (typeof CATEGORIES)[number];
-
-// Modelo que usarás en la app (cards, listas…)
-export type Product = {
+export interface Product {
   id: string;
   name: string;
-  price: number;   // CRC
+  price: number;
   stock: number;
-  image: string;   // objectURL o URL backend (por ahora placeholder)
-  category?: Category;   // <-- ahora opcional
-  description?: string;  // <-- ahora opcional
-};
+  image: string;
+  description?: string;
+  categoryId?: number | null;
+  activo: boolean;
 
-/*
-Si todavía te da lata el tipo Category, puedes cambiarlo por:
-  category?: string;
-Y seguir usando CATEGORIES solo para poblar el Select.
-*/
+  // Para compatibilidad con el form que sube imagen
+  __file?: File | null;
+}
