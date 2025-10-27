@@ -13,6 +13,7 @@ export default function ProductGrid({
   onCreate,
 }: {
   items: Product[];
+  loading?: boolean;
   onEdit: (p: Product) => void;
   onAskDelete: (p: Product) => void;
   onCreate: () => void;
