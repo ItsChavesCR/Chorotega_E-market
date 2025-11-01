@@ -24,7 +24,7 @@ export const Usability = () => {
         {/* ===== Emprendedores ===== */}
         <div>
           <h3 className="text-xl font-bold text-green-700 mb-4 text-center">
-            Para Emprendedores
+            Para emprendedores
           </h3>
 
           {/* Card 1 */}
@@ -50,7 +50,7 @@ export const Usability = () => {
             </div>
             <div>
               <p className="font-semibold text-[#111827] leading-tight">
-                Ventas Fáciles
+                Ventas fáciles
               </p>
               <p className="text-gray-600 text-sm">
                 Sistema completo de ventas con chat, pagos y seguimiento de
@@ -63,7 +63,7 @@ export const Usability = () => {
         {/* ===== Clientes ===== */}
         <div>
           <h3 className="text-xl font-bold text-[#C19A4B] mb-4 text-center">
-            Para Clientes
+            Para clientes
           </h3>
 
           {/* Card 1 */}
@@ -73,7 +73,7 @@ export const Usability = () => {
             </div>
             <div>
               <p className="font-semibold text-[#111827] leading-tight">
-                Compras Locales
+                Compras locales
               </p>
               <p className="text-gray-600 text-sm">
                 Encuentra productos únicos y auténticos de tu propia comunidad.
@@ -88,7 +88,7 @@ export const Usability = () => {
             </div>
             <div>
               <p className="font-semibold text-[#111827] leading-tight">
-                Entrega Segura
+                Entrega segura
               </p>
               <p className="text-gray-600 text-sm">
                 Recibe tus productos en casa con seguimiento en tiempo real.
@@ -100,7 +100,7 @@ export const Usability = () => {
         {/* ===== Repartidores ===== */}
         <div>
           <h3 className="text-xl font-bold text-[#D2232A] mb-4 text-center">
-            Para Repartidores
+            Para repartidores
           </h3>
 
           {/* Card 1 */}
@@ -110,7 +110,7 @@ export const Usability = () => {
             </div>
             <div>
               <p className="font-semibold text-[#111827] leading-tight">
-                Ingresos Flexibles
+                Ingresos flexibles
               </p>
               <p className="text-gray-600 text-sm">
                 Trabaja cuando quieras y genera ingresos adicionales en tu zona.
@@ -125,7 +125,7 @@ export const Usability = () => {
             </div>
             <div>
               <p className="font-semibold text-[#111827] leading-tight">
-                Comunidad Unida
+                Comunidad unida
               </p>
               <p className="text-gray-600 text-sm">
                 Sé parte esencial conectando emprendedores con clientes.

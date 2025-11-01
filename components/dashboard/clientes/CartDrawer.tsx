@@ -117,7 +117,7 @@ export default function CartDrawer() {
         </div>
 
         {carrito.length > 0 && (
-          <div className="border-t pt-4 space-y-3">
+          <div className="border-t p-8 space-y-3">
             <div className="text-sm space-y-2">
               <div className="flex justify-between">
                 <span>Subtotal:</span>

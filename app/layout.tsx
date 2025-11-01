@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Chorotega E-Market",
   description: "Tienda local digital",
+  icons: {
+    icon: "/Chorotega.svg",
+  },
 }
 
 export default function RootLayout({

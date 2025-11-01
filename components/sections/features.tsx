@@ -4,9 +4,9 @@ import React from "react";
 export const Features = () => {
   return (
     <section className="w-full py-16 px-6 bg-[#F5F0E5] text-black">
-      <div className="text-center max-w-3xl mx-auto">
+      <div className="text-center max-w-3xl mx-auto flex flex-col gap-4">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-[#202022]">
-          ¿Como Funciona Chorotega e-Market?
+          ¿Como funciona Chorotega e-Market?
         </h1>
         <p className="text-gray-600">
           Tres roles trabajando juntos para fortalecer nuestra comunidad local
