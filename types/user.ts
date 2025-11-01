@@ -6,9 +6,9 @@ export type User = {
   address?: string;
   bio?: string;
   avatarUrl?: string | null;
-  role?: "emprendedor" | "cliente" | "repartidor";
+  role?: "entrepreneur" | "client" | "courier";
   language?: "es" | "en";
-  timezone?: string; // ej: "America/Costa_Rica"
+  timezone?: string; 
 };
 
 export type UpdateUserPayload = Partial<

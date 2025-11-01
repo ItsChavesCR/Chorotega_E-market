@@ -25,33 +25,42 @@ export default function ClienteRegister() {
     setSuccessMsg("");
 
     if (password !== confirmar) {
-      setErrorMsg("Las contraseñas no coinciden");
+      setErrorMsg("⚠️ Las contraseñas no coinciden");
       return;
     }
 
     setLoading(true);
-
-    // Crear usuario en Supabase Auth
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          nombre,
-          telefono,
-          rol: "cliente", // 👈 puedes distinguir tipo de usuario aquí
+    try {
+      // 🔹 Crear usuario en Supabase Auth
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: nombre, // 👈 importante, coincide con trigger handle_new_user()
+            telefono,
+            rol: "client", // 👈 el trigger asignará automáticamente el id_rol de "client"
+          },
         },
-      },
-    });
+      });
+console.log({ data, error });
 
-    setLoading(false);
-
-    if (error) {
-      setErrorMsg(error.message);
-    } else {
-      setSuccessMsg("✅ Cuenta creada. Revisa tu correo para confirmar.");
-      // Puedes redirigir tras unos segundos o dejarlo al usuario
-      setTimeout(() => router.push("/auth/login"), 3000);
+      if (error) {
+        if (error.message.includes("already registered")) {
+          setErrorMsg("El correo ya está registrado. Intenta iniciar sesión.");
+        } else {
+          setErrorMsg(error.message);
+        }
+      } else {
+        setSuccessMsg("✅ Cuenta creada. Revisa tu correo para confirmar.");
+        // Redirigir al login tras unos segundos
+        setTimeout(() => router.push("/auth/login"), 3000);
+      }
+    } catch (err) {
+      console.error(err);
+      setErrorMsg("Error inesperado al registrarte. Intenta de nuevo.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -85,7 +94,7 @@ export default function ClienteRegister() {
             </p>
           </div>
 
-          {/* FORM GRID */}
+          {/* FORM */}
           <form onSubmit={handleRegister}>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {/* Nombre */}
@@ -166,7 +175,7 @@ export default function ClienteRegister() {
                 </div>
               </div>
 
-              {/* Confirmar contraseña */}
+              {/* Confirmar */}
               <div className="md:col-span-2">
                 <label className="mb-2 block text-sm font-semibold text-neutral-800">
                   Confirmar contraseña
@@ -202,7 +211,7 @@ export default function ClienteRegister() {
                 </p>
               )}
 
-              {/* CTA */}
+              {/* Botón */}
               <div className="md:col-span-2">
                 <button
                   type="submit"

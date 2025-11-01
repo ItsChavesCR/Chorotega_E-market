@@ -1,6 +1,6 @@
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { Product } from './types';
-import { mapProduct } from './mappers';
+
 
 export async function getProductsByEntrepreneur(idemprendedor: number): Promise<Product[]> {
   const supabase = createSupabaseServerClient();

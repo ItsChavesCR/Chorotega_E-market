@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Mail, Lock, Eye, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase/client"; // 👈 conexión al backend Supabase
+import { supabase } from "@/lib/supabase/client";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -20,7 +20,7 @@ export default function LoginForm() {
     setLoading(true);
     setErrorMsg("");
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -28,9 +28,35 @@ export default function LoginForm() {
     setLoading(false);
 
     if (error) {
-      setErrorMsg(error.message);
-    } else {
-      router.push("/dashboard/emprendedor");
+      setErrorMsg("⚠️ " + error.message);
+      return;
+    }
+
+    // ✅ Obtener datos del usuario autenticado
+    const { data: userData } = await supabase.auth.getUser();
+    const user = userData?.user;
+    const role =
+      user?.user_metadata?.rol ||
+      user?.user_metadata?.role ||
+      "emprendedor"; // fallback por compatibilidad
+
+    // ✅ Redirigir según el rol
+    switch (role.toLowerCase()) {
+      case "cliente":
+      case "client":
+        router.push("/clientes");
+        break;
+      case "emprendedor":
+      case "entrepreneur":
+        router.push("/dashboard/emprendedor");
+        break;
+      case "admin":
+      case "administrador":
+        router.push("/dashboard/admin");
+        break;
+      default:
+        router.push("/dashboard/emprendedor");
+        break;
     }
   };
 
@@ -56,7 +82,7 @@ export default function LoginForm() {
               </Link>
             </div>
 
-            {/* Heading + helper */}
+            {/* Heading */}
             <div className="mb-6">
               <h1 className="text-2xl font-extrabold tracking-tight">
                 Iniciar sesión con tu cuenta
@@ -71,13 +97,12 @@ export default function LoginForm() {
               <label className="mb-2 block text-sm font-semibold text-neutral-800">
                 Correo Electrónico
               </label>
-              <div className="mb-4 flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 ring-offset-2 focus-within:border-neutral-400 focus-within:ring-2 focus-within:ring-neutral-200">
+              <div className="mb-4 flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-neutral-200">
                 <Mail className="h-4 w-4 text-neutral-500" />
                 <input
                   type="email"
                   placeholder="maria@chorotega.com"
                   className="w-full bg-transparent text-sm outline-none placeholder:text-neutral-400"
-                  aria-label="Correo Electrónico"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -88,19 +113,18 @@ export default function LoginForm() {
               <label className="mb-2 block text-sm font-semibold text-neutral-800">
                 Contraseña
               </label>
-              <div className="flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 ring-offset-2 focus-within:border-neutral-400 focus-within:ring-2 focus-within:ring-neutral-200">
+              <div className="flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-neutral-200">
                 <Lock className="h-4 w-4 text-neutral-500" />
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   className="w-full bg-transparent text-sm outline-none placeholder:text-neutral-400"
-                  aria-label="Contraseña"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
                 <Eye
-                  className={`h-4 w-4 text-neutral-500 cursor-pointer transition ${
+                  className={`h-4 w-4 text-neutral-500 cursor-pointer ${
                     showPassword ? "text-neutral-800" : ""
                   }`}
                   onClick={() => setShowPassword(!showPassword)}
@@ -116,50 +140,21 @@ export default function LoginForm() {
                 </a>
               </div>
 
-              {/* Mensaje de error */}
               {errorMsg && (
                 <p className="mt-3 text-sm text-red-600 font-medium">
                   {errorMsg}
                 </p>
               )}
 
-              {/* Botón principal */}
               <button
                 type="submit"
                 disabled={loading}
-                className="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-b from-neutral-900 to-neutral-800 px-4 py-3 text-sm font-semibold text-white shadow-sm transition active:translate-y-px disabled:opacity-70"
+                className="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-neutral-900 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-neutral-800 disabled:opacity-70"
               >
                 {loading ? "Ingresando..." : "Iniciar sesión"}
                 <ChevronRight className="ml-2 h-4 w-4" />
               </button>
             </form>
-
-            {/* Separator */}
-            <div className="my-5 flex items-center gap-3 text-neutral-400">
-              <div className="h-px flex-1 bg-neutral-200" />
-              <span className="text-xs">o</span>
-              <div className="h-px flex-1 bg-neutral-200" />
-            </div>
-
-            {/* Google CTA (por ahora desactivado) */}
-            <button
-              type="button"
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white px-4 py-3 text-sm font-semibold text-neutral-800 shadow-sm opacity-50 cursor-not-allowed"
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 48 48"
-                aria-hidden="true"
-                className="-ml-1"
-              >
-                <path
-                  fill="#FFC107"
-                  d="M43.611 20.083H42V20H24v8h11.303C33.826 32.91 29.273 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.84 1.153 7.957 3.043l5.657-5.657C33.642 6.053 29.084 4 24 4 12.954 4 4 12.954 4 24s8.954 20 20 20c10.493 0 19-8.507 19-19 0-1.341-.138-2.651-.389-3.917z"
-                />
-              </svg>
-              Google (próximamente)
-            </button>
           </section>
 
           {/* Divider */}
@@ -173,7 +168,7 @@ export default function LoginForm() {
             <div className="relative h-56 w-56 overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
               <Image
                 src="/Chorotega.svg"
-                alt="Choroteg E-Market"
+                alt="Chorotega E-Market"
                 width={250}
                 height={100}
                 priority
