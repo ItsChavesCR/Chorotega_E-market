@@ -1,62 +1,100 @@
 "use client";
 
-import * as React from "react";
-import { UploadCloud } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useState } from "react";
+import Image from "next/image";
+import { supabase } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { Loader2, Upload } from "lucide-react";
+
+interface Props {
+  idusuario: string;
+  logoActual?: string | null;
+  onUploadComplete: (newUrl: string) => void;
+}
 
 export default function AvatarUploader({
-  name,
-  avatarUrl,
-  onUpload,
-}: {
-  name: string;
-  avatarUrl?: string | null;
-  onUpload: (file: File) => Promise<void> | void;
-}) {
-  const [file, setFile] = React.useState<File | null>(null);
-  const [preview, setPreview] = React.useState<string>(avatarUrl || "");
-  const [loading, setLoading] = React.useState(false);
-  const inputRef = React.useRef<HTMLInputElement | null>(null);
+  idusuario,
+  logoActual,
+  onUploadComplete,
+}: Props) {
+  const [uploading, setUploading] = useState(false);
+  const [preview, setPreview] = useState<string | null>(logoActual || null);
 
-  React.useEffect(() => {
-    setPreview(avatarUrl || "");
-  }, [avatarUrl]);
+  const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      const file = event.target.files?.[0];
+      if (!file) return;
 
-  React.useEffect(() => {
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    setPreview(url);
-    return () => URL.revokeObjectURL(url);
-  }, [file]);
+      setUploading(true);
 
-  const pick = () => inputRef.current?.click();
-  const change = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    setFile(f);
-    setLoading(true);
-    try { await onUpload(f); } finally { setLoading(false); }
+      // 🖼 Mostrar preview local
+      const url = URL.createObjectURL(file);
+      setPreview(url);
+
+      const fileExt = file.name.split(".").pop();
+      const fileName = `logo_${Date.now()}.${fileExt}`;
+      const filePath = `${idusuario}/${fileName}`;
+
+      // 🔹 Subir al bucket
+      const { error: uploadError } = await supabase.storage
+        .from("business-logos")
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // 🔹 Obtener URL pública
+      const { data } = supabase.storage
+        .from("business-logos")
+        .getPublicUrl(filePath);
+
+      const publicUrl = data.publicUrl;
+
+      // 🔹 Guardar en la tabla perfil_emprendedor
+      const { error: updateError } = await supabase
+        .from("perfil_emprendedor")
+        .update({ logo: publicUrl })
+        .eq("idusuario", idusuario);
+
+      if (updateError) throw updateError;
+
+      toast.success("Logo actualizado correctamente 🎉");
+      onUploadComplete(publicUrl);
+    } catch (err) {
+      console.error(err);
+      toast.error("Error al subir el logo");
+    } finally {
+      setUploading(false);
+    }
   };
 
-  const initials = React.useMemo(() => {
-    const [a = "", b = ""] = name.trim().split(/\s+/);
-    return (a[0] || "").concat(b[0] || "").toUpperCase();
-  }, [name]);
-
   return (
-    <div className="flex items-center gap-4">
-      <Avatar className="h-20 w-20">
-        <AvatarImage src={preview || ""} alt={name} />
-        <AvatarFallback className="text-lg font-semibold">{initials}</AvatarFallback>
-      </Avatar>
-      <div className="flex flex-col gap-2">
-        <Button onClick={pick} disabled={loading} className="gap-2">
-          <UploadCloud className="h-4 w-4" />
-          {loading ? "Subiendo..." : "Cambiar foto"}
-        </Button>
-        <input ref={inputRef} type="file" className="hidden" accept="image/*" onChange={change} />
-        <p className="text-xs text-muted-foreground">JPG o PNG. Máx 2 MB.</p>
+    <div className="flex flex-col items-center gap-3">
+      <div className="relative w-24 h-24">
+        <Image
+          src={preview || "/placeholder-store.png"}
+          alt="Logo del negocio"
+          fill
+          className="object-cover rounded-full border shadow-sm"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="logoUpload"
+          className="cursor-pointer flex items-center gap-2 text-sm text-blue-600 hover:underline"
+        >
+          <Upload className="w-4 h-4" />
+          {uploading ? "Subiendo..." : "Cambiar logo"}
+        </label>
+        <input
+          id="logoUpload"
+          type="file"
+          accept="image/*"
+          onChange={handleUpload}
+          className="hidden"
+          disabled={uploading}
+        />
       </div>
     </div>
   );

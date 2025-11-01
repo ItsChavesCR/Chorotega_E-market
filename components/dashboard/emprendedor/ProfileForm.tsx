@@ -1,135 +1,148 @@
 "use client";
 
-import * as React from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { UpdateUserPayload, User } from "@/types/user";
+import { supabase } from "@/lib/supabase/client";
+import { toast } from "sonner";
 
-const LANGS = [
-  { value: "es", label: "Español" },
-  { value: "en", label: "English" },
-] as const;
+interface ProfileFormProps {
+  perfil: any;
+  onProfileUpdated?: () => void;
+}
 
-export default function ProfileForm({
-  me,
-  onSave,
-  saving,
-}: {
-  me: User;
-  onSave: (payload: UpdateUserPayload) => Promise<void> | void;
-  saving?: boolean;
-}) {
-  const [form, setForm] = React.useState<UpdateUserPayload>({
-    name: me.name ?? "",
-    phone: me.phone ?? "",
-    address: me.address ?? "",
-    bio: me.bio ?? "",
-    language: (me.language as "es" | "en") ?? "es",
-    timezone: me.timezone ?? "America/Costa_Rica",
+export default function ProfileForm({ perfil, onProfileUpdated }: ProfileFormProps) {
+  const [form, setForm] = useState({
+    nombrecomercio: perfil?.nombrecomercio || "",
+    descripcion: perfil?.descripcion || "",
+    ubicacion: perfil?.ubicacion || "",
+    horario: perfil?.horario || "",
+    idcategoria: perfil?.idcategoria || "",
+    redessociales: perfil?.redessociales || {
+      facebook: "",
+      instagram: "",
+      whatsapp: "",
+    },
   });
 
-  React.useEffect(() => {
-    setForm({
-      name: me.name ?? "",
-      phone: me.phone ?? "",
-      address: me.address ?? "",
-      bio: me.bio ?? "",
-      language: (me.language as "es" | "en") ?? "es",
-      timezone: me.timezone ?? "America/Costa_Rica",
-    });
-  }, [me]);
+  const [saving, setSaving] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSave(form);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSocialChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      redessociales: { ...prev.redessociales, [name]: value },
+    }));
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from("perfil_emprendedor")
+        .update({
+          nombrecomercio: form.nombrecomercio,
+          descripcion: form.descripcion,
+          ubicacion: form.ubicacion,
+          horario: form.horario,
+          idcategoria: form.idcategoria,
+          redessociales: form.redessociales,
+        })
+        .eq("id", perfil.id);
+
+      if (error) throw error;
+
+      toast.success("Perfil actualizado correctamente");
+      onProfileUpdated?.();
+    } catch (err) {
+      console.error("Error al guardar perfil:", err);
+      toast.error("No se pudo guardar el perfil");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">Información del perfil</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={submit} className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2 sm:col-span-2">
-            <Label>Nombre</Label>
+    <div className="space-y-6 bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+      <div>
+        <Label>Nombre del negocio</Label>
+        <Input
+          name="nombrecomercio"
+          value={form.nombrecomercio}
+          onChange={handleChange}
+        />
+      </div>
+
+      <div>
+        <Label>Descripción</Label>
+        <Textarea
+          name="descripcion"
+          value={form.descripcion}
+          onChange={handleChange}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label>Ubicación</Label>
+          <Input name="ubicacion" value={form.ubicacion} onChange={handleChange} />
+        </div>
+
+        <div>
+          <Label>Horario</Label>
+          <Input name="horario" value={form.horario} onChange={handleChange} />
+        </div>
+      </div>
+
+      {/* Redes Sociales */}
+      <div className="space-y-3">
+        <Label className="font-semibold">Redes sociales</Label>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div>
+            <Label>Facebook</Label>
             <Input
-              value={form.name ?? ""}
-              onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-              required
+              name="facebook"
+              placeholder="https://facebook.com/tu_pagina"
+              value={form.redessociales.facebook}
+              onChange={handleSocialChange}
             />
           </div>
 
-          <div className="space-y-2">
-            <Label>Correo</Label>
-            <Input value={me.email} disabled />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Teléfono</Label>
+          <div>
+            <Label>Instagram</Label>
             <Input
-              value={form.phone ?? ""}
-              onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
+              name="instagram"
+              placeholder="https://instagram.com/tu_perfil"
+              value={form.redessociales.instagram}
+              onChange={handleSocialChange}
             />
           </div>
 
-          <div className="space-y-2 sm:col-span-2">
-            <Label>Dirección</Label>
+          <div>
+            <Label>WhatsApp</Label>
             <Input
-              value={form.address ?? ""}
-              onChange={(e) => setForm((p) => ({ ...p, address: e.target.value }))}
+              name="whatsapp"
+              placeholder="https://wa.me/50600000000"
+              value={form.redessociales.whatsapp}
+              onChange={handleSocialChange}
             />
           </div>
+        </div>
+      </div>
 
-          <div className="space-y-2 sm:col-span-2">
-            <Label>Sobre ti</Label>
-            <Textarea
-              rows={4}
-              value={form.bio ?? ""}
-              onChange={(e) => setForm((p) => ({ ...p, bio: e.target.value }))}
-              placeholder="Breve descripción…"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Idioma</Label>
-            <Select
-              value={form.language ?? "es"}
-              onValueChange={(v) => setForm((p) => ({ ...p, language: v as "es" | "en" }))}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {LANGS.map((l) => (
-                  <SelectItem key={l.value} value={l.value}>
-                    {l.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Zona horaria</Label>
-            <Input
-              value={form.timezone ?? ""}
-              onChange={(e) => setForm((p) => ({ ...p, timezone: e.target.value }))}
-              placeholder="America/Costa_Rica"
-            />
-          </div>
-
-          <div className="sm:col-span-2 flex justify-end gap-2 pt-2">
-            <Button type="submit" disabled={saving}>
-              {saving ? "Guardando…" : "Guardar cambios"}
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+      <div className="pt-4">
+        <Button onClick={handleSave} disabled={saving}>
+          {saving ? "Guardando..." : "Guardar cambios"}
+        </Button>
+      </div>
+    </div>
   );
 }
