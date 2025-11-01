@@ -41,37 +41,57 @@ export default function RepartidorRegister() {
     setSuccessMsg("");
 
     if (password !== confirmar) {
-      setErrorMsg("Las contraseñas no coinciden");
+      setErrorMsg("⚠️ Las contraseñas no coinciden");
       return;
     }
 
     setLoading(true);
 
-    // Crear usuario en Supabase Auth
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          nombre,
-          cedula,
-          telefono,
-          tipo_vehiculo: vehiculo,
-          info_vehiculo: infoVehiculo,
-          placa,
-          zona_reparto: zona,
-          rol: "repartidor",
+    try {
+      console.log("🚀 Registrando repartidor con metadata:", {
+        nombre,
+        cedula,
+        telefono,
+        tipo_vehiculo: vehiculo,
+        info_vehiculo: infoVehiculo,
+        placa,
+        zona_reparto: zona,
+        rol: "courier",
+      });
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/login`,
+          data: {
+            nombre,
+            cedula,
+            telefono,
+            tipo_vehiculo: vehiculo,
+            info_vehiculo: infoVehiculo,
+            placa,
+            zona_reparto: zona,
+            rol: "courier", // 👈 muy importante
+          },
         },
-      },
-    });
+      });
 
-    setLoading(false);
-
-    if (error) {
-      setErrorMsg(error.message);
-    } else {
-      setSuccessMsg("✅ Cuenta creada. Revisa tu correo para confirmar.");
-      setTimeout(() => router.push("/auth/login"), 3000);
+      if (error) {
+        if (error.message.includes("already registered")) {
+          setErrorMsg("El correo ya está registrado. Intenta iniciar sesión.");
+        } else {
+          setErrorMsg(error.message);
+        }
+      } else {
+        setSuccessMsg("✅ Cuenta creada. Revisa tu correo para confirmar.");
+        setTimeout(() => router.push("/auth/login"), 3000);
+      }
+    } catch (err: any) {
+      console.error("❌ Error inesperado:", err);
+      setErrorMsg("Error inesperado al registrarte. Intenta de nuevo.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -98,7 +118,7 @@ export default function RepartidorRegister() {
           {/* Heading */}
           <div className="mb-6">
             <h1 className="text-2xl font-extrabold tracking-tight">
-              Crear Cuenta de Repartidor
+              Crear cuenta de repartidor
             </h1>
             <p className="mt-1 text-sm text-neutral-600">
               Configura tu perfil para comenzar a entregar pedidos
@@ -106,14 +126,13 @@ export default function RepartidorRegister() {
           </div>
 
           <form onSubmit={handleRegister}>
-            {/* FORM GRID */}
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {/* Nombre */}
               <div>
                 <label className="mb-2 block text-sm font-semibold text-neutral-800">
-                  Nombre Completo
+                  Nombre completo
                 </label>
-                <div className="flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-neutral-200">
+                <div className="flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2">
                   <FileText className="h-4 w-4 text-neutral-500" />
                   <input
                     type="text"
@@ -129,9 +148,9 @@ export default function RepartidorRegister() {
               {/* Correo */}
               <div>
                 <label className="mb-2 block text-sm font-semibold text-neutral-800">
-                  Correo Electrónico
+                  Correo electrónico
                 </label>
-                <div className="flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-neutral-200">
+                <div className="flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2">
                   <Mail className="h-4 w-4 text-neutral-500" />
                   <input
                     type="email"
@@ -149,7 +168,7 @@ export default function RepartidorRegister() {
                 <label className="mb-2 block text-sm font-semibold text-neutral-800">
                   Contraseña
                 </label>
-                <div className="flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-neutral-200">
+                <div className="flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2">
                   <Lock className="h-4 w-4 text-neutral-500" />
                   <input
                     type={showPassword ? "text" : "password"}
@@ -160,8 +179,8 @@ export default function RepartidorRegister() {
                     required
                   />
                   <Eye
-                    className={`h-4 w-4 text-neutral-500 cursor-pointer ${
-                      showPassword ? "text-neutral-800" : ""
+                    className={`h-4 w-4 cursor-pointer ${
+                      showPassword ? "text-neutral-800" : "text-neutral-500"
                     }`}
                     onClick={() => setShowPassword(!showPassword)}
                   />
@@ -173,7 +192,7 @@ export default function RepartidorRegister() {
                 <label className="mb-2 block text-sm font-semibold text-neutral-800">
                   Confirmar contraseña
                 </label>
-                <div className="flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-neutral-200">
+                <div className="flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2">
                   <Lock className="h-4 w-4 text-neutral-500" />
                   <input
                     type={showPassword ? "text" : "password"}
@@ -191,11 +210,11 @@ export default function RepartidorRegister() {
                 <label className="mb-2 block text-sm font-semibold text-neutral-800">
                   Cédula
                 </label>
-                <div className="flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-neutral-200">
+                <div className="flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2">
                   <FileText className="h-4 w-4 text-neutral-500" />
                   <input
                     type="text"
-                    placeholder="Ingresa tu número de cédula"
+                    placeholder="Número de cédula"
                     className="w-full bg-transparent text-sm outline-none placeholder:text-neutral-400"
                     value={cedula}
                     onChange={(e) => setCedula(e.target.value)}
@@ -209,7 +228,7 @@ export default function RepartidorRegister() {
                 <label className="mb-2 block text-sm font-semibold text-neutral-800">
                   Teléfono
                 </label>
-                <div className="flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-neutral-200">
+                <div className="flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2">
                   <Phone className="h-4 w-4 text-neutral-500" />
                   <input
                     type="tel"
@@ -255,7 +274,7 @@ export default function RepartidorRegister() {
                 <label className="mb-2 block text-sm font-semibold text-neutral-800">
                   Placa del vehículo
                 </label>
-                <div className="flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-neutral-200">
+                <div className="flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2">
                   <Car className="h-4 w-4 text-neutral-500" />
                   <input
                     type="text"
@@ -286,7 +305,7 @@ export default function RepartidorRegister() {
                 <label className="mb-2 block text-sm font-semibold text-neutral-800">
                   Zona de reparto
                 </label>
-                <div className="flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-neutral-200">
+                <div className="flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2">
                   <MapPin className="h-4 w-4 text-neutral-500" />
                   <input
                     type="text"

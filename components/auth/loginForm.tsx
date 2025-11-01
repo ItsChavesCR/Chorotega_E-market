@@ -6,6 +6,7 @@ import { Mail, Lock, Eye, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/client"; // 👈 conexión al backend Supabase
+import { ensureUserRow, routeByRole } from "@/lib/auth-helper";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -27,11 +28,13 @@ export default function LoginForm() {
 
     setLoading(false);
 
-    if (error) {
+   if (error) {
       setErrorMsg(error.message);
-    } else {
-      router.push("/dashboard/emprendedor");
+      return;
     }
+
+    await ensureUserRow(); // ✅ inserta si es primer login
+    await routeByRole(router); // ✅ redirige al dashboard correcto
   };
 
   return (
