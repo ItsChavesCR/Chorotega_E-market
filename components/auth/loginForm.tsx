@@ -95,7 +95,7 @@ export default function LoginForm() {
             <form onSubmit={handleLogin}>
               {/* Email */}
               <label className="mb-2 block text-sm font-semibold text-neutral-800">
-                Correo Electrónico
+                Correo electrónico
               </label>
               <div className="mb-4 flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-neutral-200">
                 <Mail className="h-4 w-4 text-neutral-500" />

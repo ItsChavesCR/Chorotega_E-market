@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
-import NotificationsModal from "./NotificationsModal";
+import NotificationsModal from "./notificationsModal";
 
 
 export default function Header({ onOpenSidebar }: { onOpenSidebar: () => void }) {

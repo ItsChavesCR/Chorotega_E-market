@@ -43,7 +43,7 @@ export const Hero = () => {
               className="inline-flex items-center gap-2 rounded-md bg-[#326931] px-5 py-3 text-white font-semibold shadow hover:bg-[#285528] active:scale-[0.99]"
             >
               <Store className="h-5 w-5" />
-              Entrar al Mercado
+              Entrar al mercado
             </a>
           </div>
         </div>
