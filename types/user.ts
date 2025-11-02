@@ -1,7 +1,9 @@
-export type User = {
-  id: string;
-  name: string;
-  email: string;
+// types/user.ts
+
+export type UserRole = "entrepreneur" | "client" | "courier";
+
+export interface UserMetadata {
+  name?: string;
   phone?: string;
   address?: string;
   bio?: string;
