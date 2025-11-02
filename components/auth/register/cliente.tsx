@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { User, Mail, Phone, Lock, Eye, ChevronRight } from "lucide-react";
+import { User, Mail, Phone, Lock, Eye, ChevronRight, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
+import { HeaderLittle } from "@/components/sections/headerLittle";
 
 export default function ClienteRegister() {
   const router = useRouter();
@@ -25,38 +26,57 @@ export default function ClienteRegister() {
     setSuccessMsg("");
 
     if (password !== confirmar) {
-      setErrorMsg("Las contraseñas no coinciden");
+      setErrorMsg("⚠️ Las contraseñas no coinciden");
       return;
     }
 
     setLoading(true);
-
-    // Crear usuario en Supabase Auth
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          nombre,
-          telefono,
-          rol: "cliente", // 👈 puedes distinguir tipo de usuario aquí
+    try {
+      // 🔹 Crear usuario en Supabase Auth
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: nombre, // 👈 importante, coincide con trigger handle_new_user()
+            telefono,
+            rol: "client", // 👈 el trigger asignará automáticamente el id_rol de "client"
+          },
         },
-      },
-    });
+      });
+console.log({ data, error });
 
-    setLoading(false);
-
-    if (error) {
-      setErrorMsg(error.message);
-    } else {
-      setSuccessMsg("✅ Cuenta creada. Revisa tu correo para confirmar.");
-      // Puedes redirigir tras unos segundos o dejarlo al usuario
-      setTimeout(() => router.push("/auth/login"), 3000);
+      if (error) {
+        if (error.message.includes("already registered")) {
+          setErrorMsg("El correo ya está registrado. Intenta iniciar sesión.");
+        } else {
+          setErrorMsg(error.message);
+        }
+      } else {
+        setSuccessMsg("✅ Cuenta creada. Revisa tu correo para confirmar.");
+        // Redirigir al login tras unos segundos
+        setTimeout(() => router.push("/auth/login"), 3000);
+      }
+    } catch (err) {
+      console.error(err);
+      setErrorMsg("Error inesperado al registrarte. Intenta de nuevo.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
+      <>  
     <main className="min-h-screen text-neutral-900">
+        <div className="mb-3 flex items-center">
+          <Link
+            href="/auth/register"
+            className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm font-semibold text-neutral-700 shadow-sm transition hover:bg-neutral-50"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Atrás
+          </Link>
+        </div>
       <div className="mx-auto max-w-4xl px-4 py-8 md:py-12">
         <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5 md:p-8">
           {/* Tabs */}
@@ -78,20 +98,20 @@ export default function ClienteRegister() {
           {/* Heading */}
           <div className="mb-6">
             <h1 className="text-2xl font-extrabold tracking-tight">
-              Crear Cuenta de Cliente
+              Crear cuenta de cliente
             </h1>
             <p className="mt-1 text-sm text-neutral-600">
               Configura el perfil de cliente para comenzar a comprar
             </p>
           </div>
 
-          {/* FORM GRID */}
+          {/* FORM */}
           <form onSubmit={handleRegister}>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {/* Nombre */}
               <div>
                 <label className="mb-2 block text-sm font-semibold text-neutral-800">
-                  Nombre Completo
+                  Nombre completo
                 </label>
                 <div className="flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-neutral-200">
                   <User className="h-4 w-4 text-neutral-500" />
@@ -109,7 +129,7 @@ export default function ClienteRegister() {
               {/* Correo */}
               <div>
                 <label className="mb-2 block text-sm font-semibold text-neutral-800">
-                  Correo Electrónico
+                  Correo electrónico
                 </label>
                 <div className="flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-neutral-200">
                   <Mail className="h-4 w-4 text-neutral-500" />
@@ -166,7 +186,7 @@ export default function ClienteRegister() {
                 </div>
               </div>
 
-              {/* Confirmar contraseña */}
+              {/* Confirmar */}
               <div className="md:col-span-2">
                 <label className="mb-2 block text-sm font-semibold text-neutral-800">
                   Confirmar contraseña
@@ -202,14 +222,14 @@ export default function ClienteRegister() {
                 </p>
               )}
 
-              {/* CTA */}
+              {/* Botón */}
               <div className="md:col-span-2">
                 <button
                   type="submit"
                   disabled={loading}
                   className="mt-3 inline-flex w-full items-center justify-center rounded-xl bg-neutral-900 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-neutral-800 disabled:opacity-70"
                 >
-                  {loading ? "Creando cuenta..." : "Crear Cuenta de cliente"}
+                  {loading ? "Creando cuenta..." : "Crear cuenta de cliente"}
                   <ChevronRight className="ml-2 h-4 w-4" />
                 </button>
               </div>
@@ -218,5 +238,6 @@ export default function ClienteRegister() {
         </section>
       </div>
     </main>
+    </>
   );
 }

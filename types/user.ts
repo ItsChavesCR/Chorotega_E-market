@@ -8,21 +8,9 @@ export interface UserMetadata {
   address?: string;
   bio?: string;
   avatarUrl?: string | null;
-  role?: UserRole;
+  role?: "entrepreneur" | "client" | "courier";
   language?: "es" | "en";
-  timezone?: string; // ej: "America/Costa_Rica"
-}
-
-// Representa un usuario retornado por Supabase Auth
-export interface SupabaseUser {
-  id: string;
-  email: string;
-  user_metadata: UserMetadata;
-}
-
-export type User = UserMetadata & {
-  id: string;
-  email: string;
+  timezone?: string; 
 };
 
 export type UpdateUserPayload = Partial<

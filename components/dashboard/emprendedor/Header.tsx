@@ -3,7 +3,8 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
-import { NotificationsModal } from "./notificationsModal";
+import NotificationsModal from "./notificationsModal";
+
 
 export default function Header({ onOpenSidebar }: { onOpenSidebar: () => void }) {
   return (
@@ -22,7 +23,7 @@ export default function Header({ onOpenSidebar }: { onOpenSidebar: () => void })
             className="rounded-sm object-contain"
           />
         <h1 className="text-lg font-semibold tracking-tight">Chorotega E-Market</h1>\
-        <NotificationsModal/>
+        <NotificationsModal role="entrepreneur" />
         <div className="ml-auto" />
       </div>
     </header>

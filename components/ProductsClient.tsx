@@ -31,7 +31,7 @@ export default function ProductsClient({
         name: values.name,
         price: values.price,
         stock: values.stock,
-        category: values.category ?? null,
+        category: values.categoryId ?? null,
         description: values.description ?? null,
         image: imageUrl,
         activo: true,
@@ -51,7 +51,7 @@ export default function ProductsClient({
         name: values.name,
         price: values.price,
         stock: values.stock,
-        category: values.category ?? null,
+        category: values.categoryId ?? null,
         description: values.description ?? null,
         image: imageUrl,
       }),
@@ -76,58 +76,81 @@ export default function ProductsClient({
     // -> ver nota al final.
   }
 
-  return (
+ return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold">Mis productos</h1>
-        <button className="rounded bg-neutral-900 px-3 py-2 text-white" onClick={() => { setEditing(null); setOpen(true); }}>
+        <button
+          className="rounded bg-neutral-900 px-3 py-2 text-white"
+          onClick={() => {
+            setEditing(null)
+            setOpen(true)
+          }}
+        >
           Nuevo producto
         </button>
       </div>
 
       <div className="grid gap-3">
         {items.map((p: any) => (
-          <div key={p.id} className="flex items-center justify-between rounded border p-3">
+          <div
+            key={p.id}
+            className="flex items-center justify-between rounded border p-3 bg-white shadow-sm"
+          >
             <div className="flex items-center gap-3">
-              <img src={p.imagenes?.[0] || '/noimg.png'} className="h-12 w-12 rounded object-cover" alt="" />
+              <img
+                src={p.imagenes?.[0] || "/placeholder.jpg"}
+                className="h-12 w-12 rounded object-cover"
+                alt={p.nombre}
+              />
               <div>
                 <div className="font-medium">{p.nombre}</div>
-                <div className="text-sm text-neutral-600">₡ {Number(p.precio).toFixed(2)} · Stock {p.stock}</div>
+                <div className="text-sm text-neutral-600">
+                  ₡ {Number(p.precio).toFixed(2)} · Stock {p.stock}
+                </div>
               </div>
             </div>
+
             <div className="flex gap-2">
-              <button className="rounded border px-3 py-1 text-sm" onClick={() => { 
-                setEditing({
-                  id: String(p.id),
-                  name: p.nombre,
-                  price: p.precio,
-                  stock: p.stock,
-                  image: p.imagenes?.[0] || '',
-                  category: undefined, // si quieres, mapea idCategoria->nombre
-                  description: p.descripcion || '',
-                } as Product);
-                setOpen(true);
-              }}>Editar</button>
-              <button className="rounded border border-red-300 px-3 py-1 text-sm text-red-700"
-                onClick={() => remove(p.id)}>Eliminar</button>
+              <button
+                className="rounded border px-3 py-1 text-sm"
+                onClick={() => {
+                  setEditing({
+                    id: String(p.id),
+                    nombre: p.nombre,
+                    precio: p.precio,
+                    stock: p.stock,
+                    imagenes: p.imagenes || [],
+                    descripcion: p.descripcion || "",
+                  } as Product)
+                  setOpen(true)
+                }}
+              >
+                Editar
+              </button>
+
+              <button
+                className="rounded border border-red-300 px-3 py-1 text-sm text-red-700"
+                onClick={() => remove(p.id)}
+              >
+                Eliminar
+              </button>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Form (dialog) */}
+      {/* 📋 Formulario (Dialog) */}
       <ProductForm
         open={open}
         onOpenChange={setOpen}
         product={editing}
-        // TEMP: pasamos un onSubmit extendido que reciba también file (ver nota)
         onSubmit={async (values, id) => {
-          // @ts-ignore añadimos file si el form nos lo envía
-          const file: File | null = (values as any).__file || null;
-          if (id) await update(values, id, file);
-          else await create(values, undefined, file);
+          const file: File | null = (values as any).__file || null
+          if (id) await update(values, id, file)
+          else await create(values, undefined, file)
         }}
       />
     </div>
-  );
+  )
 }

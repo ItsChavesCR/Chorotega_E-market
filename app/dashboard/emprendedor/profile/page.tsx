@@ -1,79 +1,103 @@
 "use client";
 
-import * as React from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
-import { Card } from "@/components/ui/card";
-import AvatarUploader from "@/components/dashboard/emprendedor/AvatarUploader";
+import ProfileCard from "@/components/dashboard/emprendedor/ProfileCard";
 import ProfileForm from "@/components/dashboard/emprendedor/ProfileForm";
-import PasswordDialog from "@/components/dashboard/emprendedor/PasswordDialog";
-import type { User, UpdateUserPayload } from "@/types/user";
-
-/** DEMO: datos locales */
-const DEMO_ME: User = {
-  id: "me",
-  name: "Kris Emprendedora",
-  email: "kris@chorotega.market",
-  phone: "8888-9999",
-  address: "Nicoya, Guanacaste",
-  bio: "Productora local y amante del café.",
-  avatarUrl: "",
-  role: "emprendedor",
-  language: "es",
-  timezone: "America/Costa_Rica",
-};
+import { Loader2 } from "lucide-react";
 
 export default function ProfilePage() {
-  const [me, setMe] = React.useState<User>(DEMO_ME);
-  const [savingProfile, setSavingProfile] = React.useState(false);
-  const [savingPassword, setSavingPassword] = React.useState(false);
+  const [perfil, setPerfil] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  const handleSaveProfile = async (payload: UpdateUserPayload) => {
-    setSavingProfile(true);
-    setMe((prev) => ({ ...prev, ...payload }));
-    toast.success("Perfil actualizado (demo)");
-    setSavingProfile(false);
+  useEffect(() => {
+    fetchOrCreatePerfil();
+  }, []);
+
+  // 🔹 Cargar o crear perfil automáticamente
+  const fetchOrCreatePerfil = async () => {
+    setLoading(true);
+    try {
+      const { data: auth } = await supabase.auth.getUser();
+      const user = auth.user;
+      if (!user) {
+        toast.error("No hay sesión activa.");
+        return;
+      }
+
+      // Intentar cargar el perfil existente
+      const { data, error } = await supabase
+        .from("perfil_emprendedor")
+        .select(`
+          id,
+          idusuario,
+          nombrecomercio,
+          descripcion,
+          ubicacion,
+          horario,
+          logo,
+          idcategoria,
+          categoria:categoria(nombre)
+        `)
+        .eq("idusuario", user.id)
+        .maybeSingle();
+
+      // Si no existe, crearlo automáticamente
+      if (!data) {
+        const { error: insertError } = await supabase
+          .from("perfil_emprendedor")
+          .insert([
+            {
+              idusuario: user.id,
+              nombrecomercio: "Nuevo negocio",
+              descripcion: "",
+              ubicacion: "",
+              horario: "",
+              logo: "",
+              redessociales: {},
+              idcategoria: null,
+            },
+          ]);
+
+        if (insertError) throw insertError;
+
+        toast.success("Perfil creado automáticamente 🎉");
+        return fetchOrCreatePerfil();
+      }
+
+      setPerfil(data);
+    } catch (err) {
+      console.error("Error cargando perfil:", err);
+      toast.error("Error al cargar o crear perfil.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleUploadAvatar = async (file: File) => {
-    const objectUrl = URL.createObjectURL(file);
-    setMe((prev) => ({ ...prev, avatarUrl: objectUrl }));
-    toast.success("Foto actualizada (demo)");
+  const handleProfileUpdated = async () => {
+    await fetchOrCreatePerfil();
+    toast.success("Perfil actualizado ✅");
   };
 
-  const handleChangePassword = async (_current: string, _next: string) => {
-    setSavingPassword(true);
-    toast.success("Contraseña actualizada (demo)");
-    setSavingPassword(false);
-  };
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[50vh]">
+        <Loader2 className="animate-spin h-5 w-5 text-neutral-500" />
+        <span className="ml-2 text-neutral-500">Cargando perfil...</span>
+      </div>
+    );
+  }
 
   return (
-    <section className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-semibold tracking-tight">Perfil</h2>
-          <p className="text-sm text-muted-foreground">Administra tu información personal.</p>
-        </div>
+    <div className="space-y-8 p-6">
+      <h1 className="text-2xl font-bold">Perfil del negocio</h1>
+      <p className="text-neutral-600">
+        Configura la información básica de tu emprendimiento.
+      </p>
 
-        {/* Botón que abre el modal */}
-        <PasswordDialog
-          onChangePassword={handleChangePassword}
-          saving={savingPassword}
-        />
-      </div>
-
-      {/* Cabecera con avatar */}
-      <Card className="p-4">
-        <div className="flex items-center justify-between gap-4">
-          <AvatarUploader
-            name={me.name}
-            avatarUrl={me.avatarUrl}
-            onUpload={handleUploadAvatar}
-          />
-        </div>
-      </Card>
-
-      {/* Form de datos básicos */}
-      <ProfileForm me={me} onSave={handleSaveProfile} saving={savingProfile} />
-    </section>
+      <ProfileCard perfil={perfil} />
+      <ProfileForm perfil={perfil} onProfileUpdated={handleProfileUpdated} />
+    </div>
   );
 }

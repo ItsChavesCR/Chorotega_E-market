@@ -7,11 +7,9 @@ import {
   Mail,
   Lock,
   Eye,
-  Upload,
   Phone,
-  Link as LinkIcon,
   ChevronRight,
-  FileText,
+  ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
@@ -19,59 +17,70 @@ import { supabase } from "@/lib/supabase/client";
 export default function EmprendedorRegister() {
   const router = useRouter();
 
-  // Estados del formulario
   const [negocio, setNegocio] = useState("");
   const [email, setEmail] = useState("");
+  const [telefono, setTelefono] = useState("");
   const [password, setPassword] = useState("");
   const [confirmar, setConfirmar] = useState("");
-  const [telefono, setTelefono] = useState("");
-  const [descripcion, setDescripcion] = useState("");
-  const [redes, setRedes] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
-  // Manejar registro
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
     setSuccessMsg("");
 
     if (password !== confirmar) {
-      setErrorMsg("Las contraseñas no coinciden");
+      setErrorMsg("⚠️ Las contraseñas no coinciden");
       return;
     }
 
     setLoading(true);
-
-    // Crear usuario en Supabase Auth
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          negocio,
-          telefono,
-          descripcion,
-          redes,
-          rol: "emprendedor", // 👈 importante para distinguir tipo de usuario
+    try {
+      // Crear usuario en Supabase Auth
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            nombre_negocio: negocio,
+            telefono,
+            rol: "entrepreneur", // 👈 debe coincidir con tu tabla roles
+          },
         },
-      },
-    });
+      });
 
-    setLoading(false);
-
-    if (error) {
-      setErrorMsg(error.message);
-    } else {
-      setSuccessMsg("✅ Cuenta creada. Revisa tu correo para confirmar.");
-      setTimeout(() => router.push("/auth/login"), 3000);
+      if (error) {
+        if (error.message.includes("already registered")) {
+          setErrorMsg("El correo ya está registrado. Intenta iniciar sesión.");
+        } else {
+          setErrorMsg(error.message);
+        }
+      } else {
+        setSuccessMsg("✅ Cuenta creada. Revisa tu correo para confirmar.");
+        setTimeout(() => router.push("/auth/login"), 3000);
+      }
+    } catch (err) {
+      console.error(err);
+      setErrorMsg("Error inesperado al registrarte. Intenta de nuevo.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <main className="min-h-screen text-neutral-900">
+      <div className="mb-3 flex items-center">
+          <Link
+            href="/auth/register"
+            className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm font-semibold text-neutral-700 shadow-sm transition hover:bg-neutral-50"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Atrás
+          </Link>
+        </div>
       <div className="mx-auto max-w-4xl px-4 py-8 md:py-12">
         <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5 md:p-8">
           {/* Tabs */}
@@ -93,20 +102,20 @@ export default function EmprendedorRegister() {
           {/* Heading */}
           <div className="mb-6">
             <h1 className="text-2xl font-extrabold tracking-tight">
-              Crear Cuenta de Negocio
+              Crear cuenta de negocio
             </h1>
             <p className="mt-1 text-sm text-neutral-600">
-              Configura el perfil de tu negocio para comenzar a vender
+              Ingresa la información básica para comenzar
             </p>
           </div>
 
-          {/* FORM GRID */}
+          {/* FORM */}
           <form onSubmit={handleRegister}>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {/* Nombre del negocio */}
               <div>
                 <label className="mb-2 block text-sm font-semibold text-neutral-800">
-                  Nombre del Negocio
+                  Nombre del negocio
                 </label>
                 <div className="flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-neutral-200">
                   <Store className="h-4 w-4 text-neutral-500" />
@@ -124,7 +133,7 @@ export default function EmprendedorRegister() {
               {/* Correo */}
               <div>
                 <label className="mb-2 block text-sm font-semibold text-neutral-800">
-                  Correo Electrónico
+                  Correo electrónico
                 </label>
                 <div className="flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-neutral-200">
                   <Mail className="h-4 w-4 text-neutral-500" />
@@ -188,7 +197,7 @@ export default function EmprendedorRegister() {
               </div>
 
               {/* Teléfono */}
-              <div>
+              <div className="md:col-span-2">
                 <label className="mb-2 block text-sm font-semibold text-neutral-800">
                   Teléfono
                 </label>
@@ -201,40 +210,6 @@ export default function EmprendedorRegister() {
                     value={telefono}
                     onChange={(e) => setTelefono(e.target.value)}
                     required
-                  />
-                </div>
-              </div>
-
-              {/* Descripción */}
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-neutral-800">
-                  Descripción
-                </label>
-                <div className="flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-neutral-200">
-                  <FileText className="h-4 w-4 text-neutral-500" />
-                  <input
-                    type="text"
-                    placeholder="Breve descripción de tu negocio"
-                    className="w-full bg-transparent text-sm outline-none placeholder:text-neutral-400"
-                    value={descripcion}
-                    onChange={(e) => setDescripcion(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              {/* Redes sociales */}
-              <div className="md:col-span-2">
-                <label className="mb-2 block text-sm font-semibold text-neutral-800">
-                  Redes sociales o sitio web
-                </label>
-                <div className="flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-neutral-200">
-                  <LinkIcon className="h-4 w-4 text-neutral-500" />
-                  <input
-                    type="text"
-                    placeholder="Ingresa tus redes o enlace"
-                    className="w-full bg-transparent text-sm outline-none placeholder:text-neutral-400"
-                    value={redes}
-                    onChange={(e) => setRedes(e.target.value)}
                   />
                 </div>
               </div>

@@ -12,6 +12,7 @@ import {
   MapPin,
   FileText,
   ChevronRight,
+  ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
@@ -97,6 +98,15 @@ export default function RepartidorRegister() {
 
   return (
     <main className="min-h-screen text-neutral-900">
+      <div className="mb-3 flex items-center">
+          <Link
+            href="/auth/register"
+            className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm font-semibold text-neutral-700 shadow-sm transition hover:bg-neutral-50"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Atrás
+          </Link>
+        </div>
       <div className="mx-auto max-w-4xl px-4 py-8 md:py-12">
         <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5 md:p-8">
           {/* Tabs */}
@@ -336,7 +346,7 @@ export default function RepartidorRegister() {
                   disabled={loading}
                   className="mt-3 inline-flex w-full items-center justify-center rounded-xl bg-neutral-900 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-neutral-800 disabled:opacity-70"
                 >
-                  {loading ? "Creando cuenta..." : "Crear Cuenta de Repartidor"}
+                  {loading ? "Creando cuenta..." : "Crear cuenta de repartidor"}
                   <ChevronRight className="ml-2 h-4 w-4" />
                 </button>
               </div>
