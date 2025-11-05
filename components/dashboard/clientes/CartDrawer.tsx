@@ -137,7 +137,7 @@ export default function CartDrawer() {
               className="w-full bg-primary text-white rounded-lg hover:bg-primary/90"
               onClick={() => router.push("/checkout")}
             >
-              Ir al Checkout
+              Finalizar compra
             </Button>
 
             <Button
