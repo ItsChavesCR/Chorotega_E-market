@@ -135,9 +135,9 @@ export default function CheckoutForm({ onSubmit, onShippingChange }: Props) {
       onSubmit={handleSubmit}
       className="space-y-4 bg-white p-6 rounded-lg shadow"
     >
-      <h2 className="text-lg font-semibold mb-2">Datos de envío</h2>
+      <h2 className="text-lg font-semibold mb-8">Datos de envío</h2>
 
-      <div>
+      <div className=" flex flex-col gap-3">
         <Label>Nombre completo</Label>
         <Input
           value={form.nombre}
@@ -146,7 +146,7 @@ export default function CheckoutForm({ onSubmit, onShippingChange }: Props) {
         />
       </div>
 
-      <div>
+      <div className=" flex flex-col gap-3">
         <Label>Teléfono</Label>
         <Input
           type="tel"
@@ -158,7 +158,7 @@ export default function CheckoutForm({ onSubmit, onShippingChange }: Props) {
 
       {/* Provincia, Cantón, Distrito, Barrio */}
       <div className="grid grid-cols-2 gap-3">
-        <div>
+        <div className=" flex flex-col gap-3">
           <Label>Provincia</Label>
           <select
             className="border rounded-md w-full p-2 text-sm"
@@ -181,7 +181,7 @@ export default function CheckoutForm({ onSubmit, onShippingChange }: Props) {
           </select>
         </div>
 
-        <div>
+        <div className=" flex flex-col gap-3">
           <Label>Cantón</Label>
           <select
             className="border rounded-md w-full p-2 text-sm"
@@ -204,7 +204,7 @@ export default function CheckoutForm({ onSubmit, onShippingChange }: Props) {
           </select>
         </div>
 
-        <div>
+        <div className=" flex flex-col gap-3">
           <Label>Distrito</Label>
           <select
             className="border rounded-md w-full p-2 text-sm"
@@ -226,7 +226,7 @@ export default function CheckoutForm({ onSubmit, onShippingChange }: Props) {
           </select>
         </div>
 
-        <div>
+        <div className=" flex flex-col gap-3">
           <Label>Barrio</Label>
           <select
             className="border rounded-md w-full p-2 text-sm"
@@ -242,7 +242,7 @@ export default function CheckoutForm({ onSubmit, onShippingChange }: Props) {
         </div>
       </div>
 
-      <div>
+      <div className=" flex flex-col gap-3">
         <Label>Tipo de envío</Label>
         <select
           className="border rounded-md w-full p-2 text-sm"
@@ -263,7 +263,7 @@ export default function CheckoutForm({ onSubmit, onShippingChange }: Props) {
         </select>
       </div>
 
-      <div>
+      <div className=" flex flex-col gap-3">
         <Label>Dirección exacta / referencia</Label>
         <textarea
           className="border rounded-md w-full p-2 text-sm resize-none"
@@ -275,7 +275,7 @@ export default function CheckoutForm({ onSubmit, onShippingChange }: Props) {
         />
       </div>
 
-      <div>
+      <div  className=" flex flex-col gap-3 pb-8">
         <Label>Método de pago</Label>
         <select
           className="border rounded-md w-full p-2 text-sm"

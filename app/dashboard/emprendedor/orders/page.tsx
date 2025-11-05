@@ -1,66 +1,41 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import * as React from "react";
 import { toast } from "sonner";
 import OrdersSummary from "@/components/dashboard/emprendedor/OrdersSummary";
 import OrdersList from "@/components/dashboard/emprendedor/OrdersList";
-import {
-  STATUS_META,
-  type Order,
-  type OrderStatus,
-} from "@/types/order";
-
-/* --------------------------- mock data inicial --------------------------- */
-const INITIAL_ORDERS: Order[] = [
-  {
-    id: "o1",
-    code: "Pedido #1",
-    status: "pendiente",
-    createdAt: new Date().toISOString(),
-    customer: { name: "Ana Jiménez", phone: "8787-9090", address: "Nicoya, Barrio Guadalupe" },
-    itemsSummary: "Artesanías de cerámica (3 piezas)",
-    total: 25000,
-    note: "Cliente solicita entrega urgente",
-    
-  },
-  {
-    id: "o2",
-    code: "Pedido #2",
-    status: "confirmado",
-    createdAt: new Date(Date.now() - 3600 * 1000).toISOString(),
-    customer: { name: "Oscar Gutiérrez", phone: "8787-9090", address: "Nicoya, Barrio Guadalupe" },
-    itemsSummary: "Productos orgánicos variados",
-    total: 25000,
-    
-  },
-  {
-    id: "o3",
-    code: "Pedido #3",
-    status: "preparacion",
-    createdAt: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
-    customer: { name: "María Rojas", phone: "8888-1212", address: "Nicoya, San Martín" },
-    itemsSummary: "Café especial + Miel",
-    total: 13500,
-
-  },
-  {
-    id: "o4",
-    code: "Pedido #4",
-    status: "completado",
-    createdAt: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
-    customer: { name: "Luis Pérez", phone: "8700-3300", address: "Santa Cruz, Centro" },
-    itemsSummary: "Queso fresco (2) + Pan artesanal",
-    total: 9900,
-  },
-];
+import { STATUS_META, type OrderStatus, type Order } from "@/types/order";
+import { usePedidos } from "@/hooks/usePedidos";
 
 export default function OrdersPage() {
-  const [orders, setOrders] = React.useState<Order[]>(INITIAL_ORDERS);
+  const { pedidos, isLoading, updateStatus } = usePedidos();
   const [filter, setFilter] = React.useState<OrderStatus | "all">("all");
+
+  // Adaptar los pedidos del backend al formato que usa la UI
+  const orders: Order[] = React.useMemo(() => {
+    if (!pedidos) return [];
+    return pedidos.map((p) => ({
+      id: String(p.id),
+      code: `Pedido #${p.id}`,
+      status: p.estado as OrderStatus,
+      createdAt: p.createdat,
+      customer: {
+        name: (p as any).usuarios?.nombre ?? "Cliente desconocido",
+        phone: (p as any).usuarios?.telefono ?? "",
+        address: `${p.provincia ?? ""}, ${p.canton ?? ""}, ${p.barrio ?? ""}`.replace(/, ,/g, ","),
+      },
+      itemsSummary: "Ver productos del pedido", // podrías reemplazar con relación a pedido_item si la incluyes
+      total: Number(p.total),
+      note: p.referencia_envio ?? "",
+    }));
+  }, [pedidos]);
 
   const counts = React.useMemo(() => {
     const acc = { pendiente: 0, confirmado: 0, preparacion: 0, completado: 0 } as Record<OrderStatus, number>;
-    for (const o of orders) acc[o.status]++;
+    for (const o of orders) {
+      if (acc[o.status] !== undefined) acc[o.status]++;
+    }
     return acc;
   }, [orders]);
 
@@ -69,21 +44,32 @@ export default function OrdersPage() {
     [orders, filter]
   );
 
-  const changeStatus = (id: string, next: OrderStatus) => {
-    setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status: next } : o)));
-    toast.success(`Estado actualizado a: ${STATUS_META[next].label}`);
+  const changeStatus = async (id: string, next: OrderStatus) => {
+    try {
+      await updateStatus({ id: Number(id), estado: next });
+      toast.success(`Estado actualizado a: ${STATUS_META[next].label}`);
+    } catch (err) {
+      toast.error("Error al actualizar el estado del pedido");
+    }
   };
 
   return (
     <section className="space-y-6">
       <div>
         <h2 className="text-xl font-semibold tracking-tight">Gestión de Pedidos</h2>
-        <p className="text-sm text-muted-foreground">Administra y actualiza el estado de tus pedidos.</p>
+        <p className="text-sm text-muted-foreground">
+          Administra y actualiza el estado de tus pedidos.
+        </p>
       </div>
 
-      <OrdersSummary counts={counts} filter={filter} onChange={setFilter} />
-
-      <OrdersList orders={visible} onChangeStatus={changeStatus}  />
+      {isLoading ? (
+        <div className="text-center text-muted-foreground py-10">Cargando pedidos...</div>
+      ) : (
+        <>
+          <OrdersSummary counts={counts} filter={filter} onChange={setFilter} />
+          <OrdersList orders={visible} onChangeStatus={changeStatus} />
+        </>
+      )}
     </section>
   );
 }

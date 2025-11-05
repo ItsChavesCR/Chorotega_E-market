@@ -143,7 +143,7 @@ export default function CheckoutContainer() {
   return (
     <div className="container max-w-6xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-        💳 Checkout
+        💳 Finalizar compra
       </h1>
 
       <div className="grid md:grid-cols-2 gap-6">

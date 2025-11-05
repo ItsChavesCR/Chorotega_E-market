@@ -57,7 +57,7 @@ export async function middleware(req: NextRequest) {
   if (path.startsWith("/dashboard/repartidor") && role !== "courier") {
     return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
-  if (path.startsWith("/dashboard/cliente") && role !== "client") {
+  if (path.startsWith("/clientes") && role !== "client") {
     return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
 
