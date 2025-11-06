@@ -34,7 +34,7 @@ export default function Notifications({ userId, role, perfilId }: NotificationsP
       </Button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-96 bg-white border rounded-lg shadow-lg z-50">
+        <div className="absolute left-0 mt-2 w-96 bg-white border rounded-lg shadow-lg z-50">
           {/* Encabezado */}
           <div className="flex items-center justify-between px-4 py-3 border-b">
             <h2 className="font-semibold text-sm">Notificaciones</h2>

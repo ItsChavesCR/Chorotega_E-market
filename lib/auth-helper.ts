@@ -90,8 +90,9 @@ export async function ensureUserRow() {
       idusuario: user.id,
       tipovehiculo: user.user_metadata?.tipo_vehiculo ?? null,
       placa: user.user_metadata?.placa ?? null,
-      info_vehiculo: user.user_metadata?.info_vehiculo ?? null,
       zona: user.user_metadata?.zona_reparto ?? null,
+      info_vehiculo: user.user_metadata?.info_vehiculo ?? null,
+      
     });
 
     if (repError) console.error("❌ Error insertando perfil_repartidor:", repError);

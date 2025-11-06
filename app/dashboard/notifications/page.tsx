@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
-import NotificationsModal from "@/components/dashboard/emprendedor/NotificationsModal";
+import NotificationsModal from "@/components/dashboard/emprendedor/notificationsModal";
 import { Loader2 } from "lucide-react";
 
 type RoleName = "client" | "entrepreneur" | "courier" | "admin";
