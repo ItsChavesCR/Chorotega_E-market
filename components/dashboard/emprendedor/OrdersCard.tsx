@@ -1,8 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { MessageSquare } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -28,7 +26,6 @@ function Pill({ status }: { status: OrderStatus }) {
 export default function OrderCard({
   order,
   onChangeStatus,
-
 }: {
   order: Order;
   onChangeStatus: (id: string, next: OrderStatus) => void;
@@ -43,9 +40,12 @@ export default function OrderCard({
           <div className="text-xs text-muted-foreground">{formatDateTime(order.createdAt)}</div>
         </div>
 
+        {/* Selector de estado */}
         <div className="flex flex-wrap items-center gap-2">
-
-          <Select value={order.status} onValueChange={(v) => onChangeStatus(order.id, v as OrderStatus)}>
+          <Select
+            value={order.status}
+            onValueChange={(v) => onChangeStatus(order.id, v as OrderStatus)}
+          >
             <SelectTrigger className="w-[160px]">
               <SelectValue />
             </SelectTrigger>

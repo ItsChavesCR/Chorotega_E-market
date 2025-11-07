@@ -25,25 +25,34 @@ export default function OrdersPage() {
         phone: (p as any).usuarios?.telefono ?? "",
         address: `${p.provincia ?? ""}, ${p.canton ?? ""}, ${p.barrio ?? ""}`.replace(/, ,/g, ","),
       },
-      itemsSummary: "Ver productos del pedido", // podrías reemplazar con relación a pedido_item si la incluyes
+      itemsSummary: "Ver productos del pedido",
       total: Number(p.total),
       note: p.referencia_envio ?? "",
     }));
   }, [pedidos]);
 
+  // Contadores de estados (ajustados al nuevo ENUM)
   const counts = React.useMemo(() => {
-    const acc = { pendiente: 0, confirmado: 0, preparacion: 0, completado: 0 } as Record<OrderStatus, number>;
+    const acc = {
+      confirmado: 0,
+      en_preparacion: 0,
+      en_camino: 0,
+      entregado: 0,
+      cancelado: 0,
+    } as Record<OrderStatus, number>;
     for (const o of orders) {
       if (acc[o.status] !== undefined) acc[o.status]++;
     }
     return acc;
   }, [orders]);
 
+  // Filtro de visualización
   const visible = React.useMemo(
     () => (filter === "all" ? orders : orders.filter((o) => o.status === filter)),
     [orders, filter]
   );
 
+  // Cambiar estado de pedido
   const changeStatus = async (id: string, next: OrderStatus) => {
     try {
       await updateStatus({ id: Number(id), estado: next });
