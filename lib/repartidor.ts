@@ -23,10 +23,22 @@ export async function getRepartidorProfile() {
  * 🔹 Lista pedidos asignados al repartidor autenticado
  */
 export async function listPedidosAsignados() {
+  // 🔹 Obtener usuario actual
   const { data: auth } = await supabase.auth.getUser();
   const user = auth.user;
   if (!user) throw new Error("No hay sesión activa");
 
+  // 🔹 Buscar su perfil de repartidor (para obtener id bigint)
+  const { data: perfil, error: perfilError } = await supabase
+    .from("perfil_repartidor")
+    .select("id")
+    .eq("idusuario", user.id)
+    .maybeSingle();
+
+  if (perfilError) throw perfilError;
+  if (!perfil) throw new Error("No se encontró perfil de repartidor");
+
+  // 🔹 Listar pedidos donde idrepartidor = perfil.id
   const { data, error } = await supabase
     .from("pedido")
     .select(`
@@ -39,13 +51,12 @@ export async function listPedidosAsignados() {
       idusuario,
       usuarios (nombre, email, telefono)
     `)
-    .eq("idrepartidor", user.id)
+    .eq("idrepartidor", perfil.id)
     .order("createdat", { ascending: false });
 
   if (error) throw error;
   return data;
 }
-
 
 /**
  * 🔹 Marca pedido como entregado o cancelado

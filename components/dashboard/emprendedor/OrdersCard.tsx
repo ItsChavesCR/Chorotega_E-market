@@ -17,6 +17,7 @@ import {
   currencyCR,
   formatDateTime,
 } from "@/types/order";
+import AssignRepartidor from "./AssignRepartidor";
 
 function Pill({ status }: { status: OrderStatus }) {
   const m = STATUS_META[status];
@@ -76,6 +77,14 @@ export default function OrderCard({
               <p className="mt-1 text-xs text-muted-foreground">Nota: {order.note}</p>
             )}
           </div>
+          {/* 🔹 Bloque de asignación de repartidor */}
+          <div className="mt-4">
+            <AssignRepartidor
+              pedidoId={Number(order.id)}
+              currentRepartidor={(order as any).idrepartidor ?? null}
+            />
+          </div>
+
         </div>
 
         <div className="justify-self-end">
