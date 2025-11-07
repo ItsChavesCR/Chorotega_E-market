@@ -115,7 +115,7 @@ export async function routeByRole(router: ReturnType<typeof useRouter>, fallback
 
   const redirectTo =
     role === "client"
-      ? "/dashboard/cliente"
+      ? "/clientes"
       : role === "entrepreneur"
       ? "/dashboard/emprendedor"
       : role === "courier"
