@@ -1,34 +1,60 @@
 import { type ReactNode } from "react";
 
-export type OrderStatus = "pendiente" | "confirmado" | "preparacion" | "completado";
+export type OrderStatus =
+  | "confirmado"
+  | "en_preparacion"
+  | "en_camino"
+  | "entregado"
+  | "cancelado";
 
 export const STATUS_ORDER: OrderStatus[] = [
-  "pendiente",
   "confirmado",
-  "preparacion",
-  "completado",
+  "en_preparacion",
+  "en_camino",
+  "entregado",
+  "cancelado",
 ];
 
 export const STATUS_META: Record<
   OrderStatus,
   { label: string; softClass: string; strongClass: string; icon?: ReactNode }
 > = {
-  pendiente:   { label: "Pendiente",     softClass: "bg-amber-100 text-amber-800",   strongClass: "bg-amber-500 text-amber-50" },
-  confirmado:  { label: "Confirmado",    softClass: "bg-blue-100 text-blue-800",     strongClass: "bg-blue-600 text-blue-50" },
-  preparacion: { label: "En preparación",softClass: "bg-emerald-100 text-emerald-800",strongClass: "bg-emerald-600 text-emerald-50" },
-  completado:  { label: "Completado",    softClass: "bg-zinc-200 text-zinc-900",     strongClass: "bg-zinc-800 text-zinc-50" },
+  confirmado: {
+    label: "Confirmado",
+    softClass: "bg-blue-100 text-blue-800",
+    strongClass: "bg-blue-600 text-blue-50",
+  },
+  en_preparacion: {
+    label: "En preparación",
+    softClass: "bg-amber-100 text-amber-800",
+    strongClass: "bg-amber-600 text-amber-50",
+  },
+  en_camino: {
+    label: "En camino",
+    softClass: "bg-emerald-100 text-emerald-800",
+    strongClass: "bg-emerald-600 text-emerald-50",
+  },
+  entregado: {
+    label: "Entregado",
+    softClass: "bg-zinc-200 text-zinc-900",
+    strongClass: "bg-zinc-800 text-zinc-50",
+  },
+  cancelado: {
+    label: "Cancelado",
+    softClass: "bg-red-100 text-red-800",
+    strongClass: "bg-red-600 text-red-50",
+  },
 };
 
 export type Order = {
   id: string;
-  code: string; 
+  code: string;
   status: OrderStatus;
   createdAt: string;
   customer: { name: string; phone: string; address: string };
   itemsSummary: string;
-  total: number; 
+  total: number;
   note?: string;
-
 };
 
 export const currencyCR = new Intl.NumberFormat("es-CR", {

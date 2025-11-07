@@ -15,3 +15,11 @@ export type Pedido = {
   referencia_envio?: string | null;
   tipo_envio?: "domicilio" | "punto_encuentro" | "retiro_local" | null;
 };
+
+export type OrderStatus =
+  | "confirmado"
+  | "en_preparacion"
+  | "en_camino"
+  | "entregado"
+  | "cancelado";
+
