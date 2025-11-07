@@ -1,4 +1,5 @@
-export type PeerRole = "cliente" | "repartidor";
+export type PeerRole = "client" | "entrepreneur" | "courier" | "admin";
+
 
 export type Conversation = {
   id: string;
