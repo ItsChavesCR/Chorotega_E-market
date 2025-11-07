@@ -42,8 +42,7 @@ export default function Sidebar({ open }: SidebarProps) {
     >
       {/* Header */}
       <div className="flex items-center gap-2 border-b border-neutral-200 px-4 py-4">
-        <Bike className="h-6 w-6 text-green-700" />
-        <h2 className="text-lg font-bold text-neutral-800">Repartidor</h2>
+        <h2 className="text-lg font-bold text-neutral-800">Menú</h2>
       </div>
 
       {/* Navigation */}
