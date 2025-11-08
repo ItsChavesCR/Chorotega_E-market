@@ -79,7 +79,6 @@ await fetch("/api/auth", {
   setLoading(false);
 };
 
-
   return (
     <main className="min-h-screen text-neutral-900">
       <div className="mx-auto max-w-6xl px-4 py-2 md:py-24">

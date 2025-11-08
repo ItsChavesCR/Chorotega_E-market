@@ -38,7 +38,7 @@ export default function RepartidorProfilePage() {
 
   return (
     <div className="space-y-8 p-6">
-      <h1 className="text-2xl font-bold">Perfil del Repartidor</h1>
+      <h1 className="text-2xl font-bold">Perfil del repartidor</h1>
       <p className="text-neutral-600">
         Administra tu información y estado de disponibilidad.
       </p>

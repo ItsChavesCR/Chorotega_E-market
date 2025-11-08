@@ -11,7 +11,7 @@ export interface Notification {
   idusuario?: string
   idemprendedor?: number
   idrepartidor?: number
-  tipo_receptor: "client" | "entrepreneur" | "courier"
+  tipo_receptor: "client" | "entrepreneur" | "repartidor"
   titulo: string
   mensaje?: string
   icono?: string
@@ -22,7 +22,7 @@ export interface Notification {
 
 interface UseNotificationsProps {
   userId?: string
-  role: "client" | "entrepreneur" | "courier"
+  role: "client" | "entrepreneur" | "repartidor"
   perfilId?: number // para emprendedor o repartidor (bigint)
 }
 
@@ -38,7 +38,7 @@ export function useNotifications({ userId, role, perfilId }: UseNotificationsPro
 
     if (role === "client" && userId) query = query.eq("idusuario", userId)
     if (role === "entrepreneur" && perfilId) query = query.eq("idemprendedor", perfilId)
-    if (role === "courier" && perfilId) query = query.eq("idrepartidor", perfilId)
+    if (role === "repartidor" && perfilId) query = query.eq("idrepartidor", perfilId)
 
     const { data, error } = await query
 
@@ -61,7 +61,7 @@ export function useNotifications({ userId, role, perfilId }: UseNotificationsPro
           const isTarget =
             (role === "client" && newNotif.idusuario === userId) ||
             (role === "entrepreneur" && newNotif.idemprendedor === perfilId) ||
-            (role === "courier" && newNotif.idrepartidor === perfilId)
+            (role === "repartidor" && newNotif.idrepartidor === perfilId)
 
           if (isTarget) {
             setNotifications((prev) => [newNotif, ...prev])

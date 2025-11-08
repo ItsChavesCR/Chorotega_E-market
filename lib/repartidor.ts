@@ -2,6 +2,38 @@
 import { supabase } from "@/lib/supabase/client";
 
 /**
+ * 🔹 Obtiene el conteo de notificaciones no leídas del repartidor autenticado
+ */
+export async function getUnreadNotificationsCount() {
+  // Obtener usuario actual
+  const { data: auth } = await supabase.auth.getUser();
+  const user = auth.user;
+  if (!user) throw new Error("No hay sesión activa");
+
+  // Buscar el perfil de repartidor (id bigint)
+  const { data: perfil, error: perfilError } = await supabase
+    .from("perfil_repartidor")
+    .select("id")
+    .eq("idusuario", user.id)
+    .maybeSingle();
+
+  if (perfilError) throw perfilError;
+  if (!perfil) throw new Error("No se encontró perfil de repartidor");
+
+  // Contar notificaciones no leídas
+  const { count, error } = await supabase
+    .from("notificaciones")
+    .select("*", { count: "exact", head: true })
+    .eq("tipo_receptor", "repartidor")
+    .eq("idrepartidor", perfil.id)
+    .eq("leida", false);
+
+  if (error) throw error;
+  return count ?? 0;
+}
+
+
+/**
  * 🔹 Obtiene el perfil del repartidor autenticado
  */
 export async function getRepartidorProfile() {
@@ -61,14 +93,15 @@ export async function listPedidosAsignados() {
 /**
  * 🔹 Marca pedido como entregado o cancelado
  */
-export async function updateEstadoPedido(idPedido: number, nuevoEstado: "en_camino" | "entregado" | "cancelado") {
-  // Insertar historial en estado_pedido
-  const { error: insertError } = await supabase
+export async function updateEstadoPedido(
+  idPedido: number,
+  nuevoEstado: "en_camino" | "entregado" | "cancelado"
+) {
+  const { error } = await supabase
     .from("estado_pedido")
-    .insert([{ idpedido: idPedido, estado: nuevoEstado }]);
-  if (insertError) throw insertError;
+    .insert([{ idpedido: idPedido, estado: nuevoEstado, rol: "repartidor" }]);
 
-  // Trigger actualiza pedido.estado automáticamente
+  if (error) throw error;
   return true;
 }
 

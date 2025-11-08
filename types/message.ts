@@ -1,4 +1,4 @@
-export type PeerRole = "client" | "entrepreneur" | "courier" | "admin";
+export type PeerRole = "client" | "entrepreneur" | "repartidor" | "admin";
 
 
 export type Conversation = {
