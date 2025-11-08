@@ -294,7 +294,7 @@ export default function RepartidorOrdersPage() {
                     <p className="flex items-center gap-2">
                       <User className="h-4 w-4 text-neutral-600" />
                       <span>
-                        <strong>Cliente:</strong> {p.usuarios?.nombre ?? "—"}
+                        <strong>Cliente:</strong> {p.nombrecliente ?? "—"}
                       </span>
                     </p>
 

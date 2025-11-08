@@ -8,6 +8,8 @@ import {
   UserCircle,
   MessageSquare,
   LogOut,
+  Home,
+  User,
 } from "lucide-react";
 import clsx from "clsx";
 import { supabase } from "@/lib/supabase/client";

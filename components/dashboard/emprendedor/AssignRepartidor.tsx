@@ -10,14 +10,20 @@ type Props = {
   currentRepartidor?: number | null;
 };
 
-type Repartidor = {
+export type UsuarioRelacionado = {
+  nombre?: string | null;
+  email?: string | null;
+};
+
+export type Repartidor = {
   id: number;
+  nombre: string | null,
   idusuario: string;
   zona: string | null;
   tipovehiculo: string | null;
   activo: boolean;
   reputacion: number;
-  usuarios?: { nombre?: string | null; email?: string | null };
+  usuarios?: UsuarioRelacionado;
 };
 
 export default function AssignRepartidor({ pedidoId, currentRepartidor }: Props) {
@@ -31,7 +37,8 @@ export default function AssignRepartidor({ pedidoId, currentRepartidor }: Props)
         .from("perfil_repartidor")
         .select(
           `id, idusuario, zona, tipovehiculo, reputacion, activo,
-           usuarios (nombre, email)`
+          nombre`
+
         )
         .eq("activo", true);
 
@@ -86,7 +93,7 @@ export default function AssignRepartidor({ pedidoId, currentRepartidor }: Props)
           <option value="">Seleccionar repartidor...</option>
           {repartidores.map((r) => (
             <option key={r.id} value={r.id}>
-              {r.usuarios?.nombre || "Sin nombre"} — {r.tipovehiculo ?? "Vehículo"}{" "}
+              {r.nombre || ""} — {r.tipovehiculo ?? "Vehículo"}{" "}
               {r.zona ? `(${r.zona})` : ""}
             </option>
           ))}
