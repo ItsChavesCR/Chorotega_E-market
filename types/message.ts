@@ -1,26 +1,35 @@
+// src/types/message.ts
 export type PeerRole = "client" | "entrepreneur" | "repartidor" | "admin";
 
-
 export type Conversation = {
-  id: string;
-  orderId?: string;
-  orderCode?: string;          // ej: "Pedido #23"
+  id: number;
+  orderId?: number | null;
+  orderCode?: string | null;
   otherUser: {
     id: string;
     name: string;
-    role: PeerRole;            // Cliente o Repartidor
+    role: PeerRole;
     avatarUrl?: string | null;
   };
-  lastMessage: {
+  lastMessage?: {
+    id: number;
     text: string;
     senderId: string;
-    createdAt: string;         // ISO
+    createdAt: string; // ISO
   };
   unreadCount?: number;
-  updatedAt: string;           // ISO
+  updatedAt: string; // ISO
 };
 
-export type ConversationFilter = "all" | PeerRole;
+export type ConversationFilter = "all" | "client" | "repartidor";
+
+export type ChatMessage = {
+  id: number;
+  conversationId: number;
+  senderId: string;
+  text: string;
+  createdAt: string; // ISO
+};
 
 export function formatDateTime(iso: string) {
   const d = new Date(iso);
@@ -32,15 +41,6 @@ export function formatDateTime(iso: string) {
     minute: "2-digit",
   });
 }
-
-export type ChatMessage = {
-  id: string;
-  conversationId: string;
-  senderId: string;     // "me" para el emprendedor actual en el front
-  text: string;
-  createdAt: string;    // ISO
-};
-
 export function formatTime(iso: string) {
   const d = new Date(iso);
   return d.toLocaleTimeString("es-CR", { hour: "2-digit", minute: "2-digit" });
