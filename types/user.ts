@@ -14,5 +14,5 @@ export interface UserMetadata {
 };
 
 export type UpdateUserPayload = Partial<
-  Pick<User, "name" | "phone" | "address" | "bio" | "language" | "timezone">
+  Pick<UserMetadata, "name" | "phone" | "address" | "bio" | "language" | "timezone">
 >;

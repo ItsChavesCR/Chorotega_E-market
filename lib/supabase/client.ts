@@ -1,4 +1,3 @@
-// lib/supabase/client.ts
 import { createClient } from "@supabase/supabase-js";
 
 const SUPABASE_URL =
@@ -10,11 +9,12 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   throw new Error("❌ Missing Supabase environment variables");
 }
 
-// ✅ Cliente global único compartido en todo el proyecto
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
     persistSession: true,
     detectSessionInUrl: true,
     storageKey: "supabase-auth",
+    autoRefreshToken: true, // ✅ Asegura mantener sesión viva
   },
 });
+

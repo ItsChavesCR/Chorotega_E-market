@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Mail, Lock, Eye, ChevronRight } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase/client"; // 👈 conexión al backend Supabase
-import { ensureUserRow, routeByRole } from "@/lib/auth-helper";
+import Image from "next/image";
+import { supabase } from "@/lib/supabase/client";
+import { ensureUserRow, getUserRole } from "@/lib/auth-helper";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -17,63 +17,76 @@ export default function LoginForm() {
   const [errorMsg, setErrorMsg] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setErrorMsg("");
+  e.preventDefault();
+  setLoading(true);
+  setErrorMsg("");
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
 
+  console.log("🟢 Login response:", data, error);
+const session = await supabase.auth.getSession();
+console.log("🟢 Session post-login:", session);
+const userRes = await supabase.auth.getUser();
+console.log("🟢 User post-login:", userRes);
+
+
+  if (error) {
+    setErrorMsg("⚠️ " + error.message);
     setLoading(false);
+    return;
+  }
 
-    if (error) {
-      setErrorMsg("⚠️ " + error.message);
-      return;
-    }
+// 🔐 Graba la cookie SSR inmediatamente
+await fetch("/api/auth", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ event: "SIGNED_IN", session: data.session }),
+});
 
-    // ✅ Obtener datos del usuario autenticado
-    const { data: userData } = await supabase.auth.getUser();
-    const user = userData?.user;
-    const role =
-      user?.user_metadata?.rol ||
-      user?.user_metadata?.role ||
-      "emprendedor"; // fallback por compatibilidad
+// ...ensureUserRow(), getUserRole(), y luego router.push(...)
 
-    // ✅ Redirigir según el rol
-    switch (role.toLowerCase()) {
-      case "cliente":
-      case "client":
-        router.push("/clientes");
-        break;
-      case "emprendedor":
-      case "entrepreneur":
-        router.push("/dashboard/emprendedor");
-        break;
-      case "repartidor":
-      case "repartidor":
-        router.push("/dashboard/repartidor");
-        break;
-      default:
-        router.push("/dashboard/emprendedor");
-        break;
-    }
 
-    await ensureUserRow(); // ✅ inserta si es primer login
-    await routeByRole(router); // ✅ redirige al dashboard correcto
-  };
+  // Asegura el registro del usuario
+  await ensureUserRow();
+
+  // Obtén el rol real del usuario
+  const role = await getUserRole();
+
+  console.log("✅ Rol detectado:", role);
+
+  // Redirige según el rol
+  switch (role) {
+    case "client":
+      router.push("/clientes");
+      break;
+    case "entrepreneur":
+      router.push("/dashboard/emprendedor");
+      break;
+    case "repartidor":
+      router.push("/dashboard/repartidor");
+      break;
+    case "admin":
+      router.push("/dashboard/admin");
+      break;
+    default:
+      router.push("/unauthorized");
+      break;
+  }
+
+  setLoading(false);
+};
 
   return (
     <main className="min-h-screen text-neutral-900">
       <div className="mx-auto max-w-6xl px-4 py-2 md:py-24">
         <div className="grid gap-8 md:grid-cols-[1fr_minmax(0,_1px)_1fr]">
-          {/* LEFT PANEL */}
           <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5 md:p-8">
-            {/* Top Tabs */}
             <div className="mb-6 flex w-full gap-3">
               <button
-                className="flex-1 rounded-xl bg-neutral-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-neutral-800"
+                className="flex-1 rounded-xl bg-neutral-900 px-4 py-2 text-sm font-semibold text-white shadow-sm"
                 type="button"
               >
                 Iniciar sesión
@@ -86,7 +99,6 @@ export default function LoginForm() {
               </Link>
             </div>
 
-            {/* Heading */}
             <div className="mb-6">
               <h1 className="text-2xl font-extrabold tracking-tight">
                 Iniciar sesión con tu cuenta
@@ -97,7 +109,6 @@ export default function LoginForm() {
             </div>
 
             <form onSubmit={handleLogin}>
-              {/* Email */}
               <label className="mb-2 block text-sm font-semibold text-neutral-800">
                 Correo electrónico
               </label>
@@ -113,7 +124,6 @@ export default function LoginForm() {
                 />
               </div>
 
-              {/* Password */}
               <label className="mb-2 block text-sm font-semibold text-neutral-800">
                 Contraseña
               </label>
@@ -135,15 +145,6 @@ export default function LoginForm() {
                 />
               </div>
 
-              <div className="mt-2 text-right">
-                <a
-                  href="#"
-                  className="text-sm font-medium text-neutral-700 underline-offset-2 hover:underline"
-                >
-                  ¿Olvidaste tu contraseña?
-                </a>
-              </div>
-
               {errorMsg && (
                 <p className="mt-3 text-sm text-red-600 font-medium">
                   {errorMsg}
@@ -161,10 +162,8 @@ export default function LoginForm() {
             </form>
           </section>
 
-          {/* Divider */}
           <div className="hidden md:block md:h-full md:w-px md:bg-neutral-200" />
 
-          {/* RIGHT PANEL */}
           <aside className="flex flex-col items-center justify-center gap-6 md:pl-8">
             <h2 className="text-center text-3xl font-extrabold tracking-tight">
               Chorotega E-Market
