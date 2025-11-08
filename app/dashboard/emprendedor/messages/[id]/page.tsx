@@ -1,74 +1,70 @@
+// src/app/dashboard/emprendedor/messages/[id]/page.tsx
 "use client";
 
-import * as React from "react";
 import { useParams } from "next/navigation";
-import ChatWindow from "@/components/dashboard/emprendedor/ChatWindow";
-import type { ChatMessage, Conversation } from "@/types/message";
+import { useChat } from "@/hooks/messages/useChat";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { formatTime } from "@/types/message";
+import { supabase } from "@/lib/supabase/client";
 
-/** MOCKS mínimos para que funcione hoy */
-const MOCK_CONVERSATIONS: Conversation[] = [
-  {
-    id: "c1",
-    orderId: "o21",
-    orderCode: "Pedido #21",
-    otherUser: { id: "u10", name: "Ana Jiménez", role: "cliente", avatarUrl: "" },
-    lastMessage: { text: "¿Podría entregar hoy en la tarde?", senderId: "u10", createdAt: new Date().toISOString() },
-    unreadCount: 2,
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: "c2",
-    orderId: "o22",
-    orderCode: "Pedido #22",
-    otherUser: { id: "u11", name: "Carlos Mena", role: "repartidor", avatarUrl: "" },
-    lastMessage: { text: "Ya voy en camino.", senderId: "u11", createdAt: new Date().toISOString() },
-    unreadCount: 0,
-    updatedAt: new Date().toISOString(),
-  },
-];
+export default function ChatPage() {
+  const params = useParams<{ id: string }>();
+  const conversationId = Number(params.id);
+  const { messages, loading, send } = useChat(conversationId);
+  const [text, setText] = useState("");
 
-const MOCK_MESSAGES: Record<string, ChatMessage[]> = {
-  c1: [
-    { id: "m1", conversationId: "c1", senderId: "u10", text: "Hola, ¿tendrán entrega hoy?", createdAt: new Date(Date.now() - 3600_000).toISOString() },
-    { id: "m2", conversationId: "c1", senderId: "me", text: "¡Claro! ¿Cuál horario te sirve?", createdAt: new Date(Date.now() - 3400_000).toISOString() },
-    { id: "m3", conversationId: "c1", senderId: "u10", text: "Después de las 3pm está perfecto.", createdAt: new Date(Date.now() - 3300_000).toISOString() },
-  ],
-  c2: [
-    { id: "m1", conversationId: "c2", senderId: "u11", text: "Ya voy en camino a la dirección.", createdAt: new Date(Date.now() - 1800_000).toISOString() },
-    { id: "m2", conversationId: "c2", senderId: "me", text: "¡Gracias! Avísame al entregar.", createdAt: new Date(Date.now() - 1700_000).toISOString() },
-  ],
-};
-
-export default function ConversationPage() {
-  const { id } = useParams<{ id: string }>();
-
-  const conv = React.useMemo(
-    () => MOCK_CONVERSATIONS.find((c) => c.id === id),
-    [id]
-  );
-
-  if (!conv) {
-    return (
-      <div className="grid place-items-center rounded-2xl border bg-card p-10 text-center">
-        <div>
-          <p className="font-medium">Conversación no encontrada</p>
-          <p className="text-sm text-muted-foreground">Vuelve a la bandeja de mensajes.</p>
-        </div>
-      </div>
-    );
-  }
-
-  const initial = MOCK_MESSAGES[id as string] ?? [];
+  if (!conversationId) return null;
 
   return (
-    <section className="space-y-4">
-      <ChatWindow
-        name={conv.otherUser.name}
-        role={conv.otherUser.role}
-        orderCode={conv.orderCode}
-        initialMessages={initial}
-        me="me"
-      />
+    <section className="flex h-[calc(100vh-160px)] flex-col rounded-xl border bg-card">
+      <div className="flex-1 space-y-2 overflow-y-auto p-4">
+        {loading ? (
+          <p className="text-center text-sm text-muted-foreground">Cargando…</p>
+        ) : (
+          messages.map((m) => (
+            <Bubble key={m.id} message={m.text} createdAt={m.createdAt} senderId={m.senderId} />
+          ))
+        )}
+      </div>
+      <form
+        onSubmit={async (e) => {
+          e.preventDefault();
+          const t = text.trim();
+          if (!t) return;
+          await send(t);
+          setText("");
+        }}
+        className="flex gap-2 border-t p-3"
+      >
+        <Input value={text} onChange={(e) => setText(e.target.value)} placeholder="Escribe un mensaje…" />
+        <Button type="submit">Enviar</Button>
+      </form>
     </section>
+  );
+}
+
+function Bubble({ message, createdAt, senderId }: { message: string; createdAt: string; senderId: string }) {
+  const [me, setMe] = useState<string>("");
+  // obtener mi id solo una vez
+  useState(() => {
+    supabase.auth.getUser().then(({ data }) => setMe(data?.user?.id ?? ""));
+  });
+  const mine = me && senderId === me;
+
+  return (
+    <div className={`flex ${mine ? "justify-end" : "justify-start"}`}>
+      <div
+        className={`max-w-[70%] rounded-2xl px-3 py-2 text-sm shadow-sm ${
+          mine ? "bg-neutral-900 text-white" : "bg-white text-neutral-900 border"
+        }`}
+      >
+        <p>{message}</p>
+        <span className={`mt-1 block text-[10px] opacity-70 ${mine ? "text-gray-200" : "text-gray-500"}`}>
+          {formatTime(createdAt)}
+        </span>
+      </div>
+    </div>
   );
 }

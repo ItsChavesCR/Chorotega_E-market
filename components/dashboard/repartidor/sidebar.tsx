@@ -8,10 +8,10 @@ import {
   UserCircle,
   MessageSquare,
   LogOut,
-  Bike,
 } from "lucide-react";
 import clsx from "clsx";
 import { supabase } from "@/lib/supabase/client";
+import { useState } from "react";
 
 type SidebarProps = {
   open: boolean;
@@ -28,10 +28,22 @@ const navItems = [
 export default function Sidebar({ open }: SidebarProps) {
   const pathname = usePathname();
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    window.location.href = "/auth/login";
-  };
+  const [loggingOut, setLoggingOut] = useState(false);
+
+const handleLogout = async () => {
+  setLoggingOut(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { error } = await supabase.auth.signOut();
+  await fetch("/api/auth", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ event: "SIGNED_OUT", session: null }),
+  });
+  setLoggingOut(false);
+  window.location.href = "/auth/login";
+};
+
+
 
   return (
     <aside
@@ -75,7 +87,7 @@ export default function Sidebar({ open }: SidebarProps) {
           className="flex w-full items-center justify-center gap-2 rounded-lg bg-neutral-900 px-3 py-2 text-sm font-semibold text-white hover:bg-neutral-800"
         >
           <LogOut className="h-4 w-4" />
-          Cerrar sesión
+          {loggingOut ? "Cerrando sesión..." : "Cerrar sesión"}
         </button>
       </div>
     </aside>
