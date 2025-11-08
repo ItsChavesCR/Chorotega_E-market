@@ -163,6 +163,7 @@ export default function ProfileForm({ perfil, onProfileUpdated }: Props) {
       const { error: prError } = await supabase
         .from("perfil_repartidor")
         .update({
+          nombre: form.nombre,
           tipovehiculo: form.tipovehiculo,
           placa: form.placa,
           cedula: form.cedula,

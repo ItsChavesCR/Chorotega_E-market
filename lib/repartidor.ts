@@ -81,7 +81,7 @@ export async function listPedidosAsignados() {
       direccionentrega,
       createdat,
       idusuario,
-      usuarios (nombre, email, telefono)
+      nombrecliente
     `)
     .eq("idrepartidor", perfil.id)
     .order("createdat", { ascending: false });
