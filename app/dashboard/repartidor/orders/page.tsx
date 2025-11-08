@@ -2,7 +2,17 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { toast } from "sonner";
-import { RefreshCw, CheckCircle2, XCircle, Package, Truck, BadgeCheck, Loader2 } from "lucide-react";
+import {
+  RefreshCw,
+  CheckCircle2,
+  XCircle,
+  Package,
+  Truck,
+  BadgeCheck,
+  Loader2,
+  User,
+  MapPin,
+} from "lucide-react";
 import {
   listPedidosAsignados,
   updateEstadoPedido,
@@ -33,20 +43,31 @@ function SummaryTile({
     <button
       type="button"
       onClick={onClick}
-      className={cx(
-        "rounded-2xl border p-4 text-left transition hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/40",
-        active ? "border-primary/40 bg-primary/5" : "bg-card"
-      )}
+      className={`rounded-xl border bg-white p-4 text-left shadow-sm hover:shadow-md transition
+        ${active ? "ring-2 ring-green-600/30" : ""}`}
     >
       <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">{title}</div>
-        <div className="opacity-70">{icon}</div>
+        <p className="text-sm text-neutral-600">{title}</p>
+        <div className="text-neutral-500">{icon}</div>
       </div>
-      <div className="mt-2 text-2xl font-semibold">{value}</div>
+      <h3
+        className={`mt-2 text-2xl font-bold ${
+          title === "Confirmados"
+            ? "text-blue-700"
+            : title === "En camino"
+            ? "text-amber-600"
+            : title === "Entregados"
+            ? "text-emerald-700"
+            : title === "Cancelados"
+            ? "text-red-600"
+            : "text-neutral-800"
+        }`}
+      >
+        {value}
+      </h3>
     </button>
   );
 }
-
 // ======================================================================
 
 export default function RepartidorOrdersPage() {
@@ -109,7 +130,7 @@ export default function RepartidorOrdersPage() {
       )
       .subscribe();
 
-    console.log("👂 Suscrito a cambios de pedidos en tiempo real");
+    console.log("Suscrito a cambios de pedidos en tiempo real");
   };
 
   // 🔹 Cambiar estado
@@ -119,7 +140,7 @@ export default function RepartidorOrdersPage() {
       await createNotificacion({
         idpedido: p.id,
         tipo_receptor: "cliente",
-        titulo: "Pedido entregado 🎉",
+        titulo: "Pedido entregado",
         mensaje: "Tu pedido ha sido entregado exitosamente",
         idrepartidor: p.idrepartidor ?? null,
         idusuario: p.idusuario,
@@ -177,7 +198,7 @@ export default function RepartidorOrdersPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-semibold tracking-tight">
-            Pedidos Asignados
+            Pedidos asignados
           </h2>
           <p className="text-sm text-muted-foreground">
             Visualiza y gestiona los pedidos que tienes asignados.
@@ -242,55 +263,72 @@ export default function RepartidorOrdersPage() {
               </div>
             </div>
           ) : (
-            visibles.map((p) => (
-              <div
-                key={p.id}
-                className="rounded-xl border bg-card p-5 shadow-sm space-y-2 ring-1 ring-neutral-200 hover:shadow-md transition"
-              >
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <h3 className="font-semibold text-lg">
-                    Pedido #{p.id}
-                  </h3>
-                  <span
-                    className={cx(
-                      "text-sm font-medium",
-                      p.estado === "entregado" && "text-green-600",
-                      p.estado === "en_camino" && "text-blue-600",
-                      p.estado === "cancelado" && "text-red-600"
-                    )}
-                  >
-                    {p.estado}
-                  </span>
-                </div>
+            visibles.map((p) => {
+              const estadoLegible =
+                p.estado
+                  ?.replace(/_/g, " ")
+                  ?.toLowerCase()
+                  ?.replace(/\b\w/g, (l: string) => l.toUpperCase()) || "—";
 
-                <p className="text-sm">
-                  <strong>Cliente:</strong> {p.usuarios?.nombre ?? "—"}
-                </p>
-                <p className="text-sm">
-                  <strong>Dirección:</strong> {p.direccionentrega ?? "—"}
-                </p>
-                <p className="text-sm">
-                  <strong>Total:</strong> ₡{p.total}
-                </p>
+              return (
+                <div
+                  key={p.id}
+                  className="rounded-xl border bg-card p-5 shadow-sm space-y-2 ring-1 ring-neutral-200 hover:shadow-md transition"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <h3 className="font-semibold text-lg">Pedido #{p.id}</h3>
+                    <span
+                      className={cx(
+                        "text-sm font-semibold",
+                        p.estado === "entregado" && "text-green-600",
+                        p.estado === "en_camino" && "text-blue-600",
+                        p.estado === "cancelado" && "text-red-600",
+                        p.estado === "en_preparacion" && "text-yellow-600"
+                      )}
+                    >
+                      {estadoLegible}
+                    </span>
+                  </div>
 
-                <div className="flex gap-3 mt-3">
-                  <button
-                    onClick={() => marcarEntregado(p)}
-                    disabled={p.estado === "entregado"}
-                    className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-3 py-2 text-sm text-white font-semibold hover:bg-green-700 disabled:opacity-60"
-                  >
-                    <CheckCircle2 className="h-4 w-4" /> Entregado
-                  </button>
-                  <button
-                    onClick={() => cancelarPedido(p)}
-                    disabled={p.estado === "cancelado"}
-                    className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-3 py-2 text-sm text-white font-semibold hover:bg-red-700 disabled:opacity-60"
-                  >
-                    <XCircle className="h-4 w-4" /> Cancelar
-                  </button>
+                  <div className="text-sm space-y-1">
+                    <p className="flex items-center gap-2">
+                      <User className="h-4 w-4 text-neutral-600" />
+                      <span>
+                        <strong>Cliente:</strong> {p.usuarios?.nombre ?? "—"}
+                      </span>
+                    </p>
+
+                    <p className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-neutral-600" />
+                      <span>
+                        <strong>Dirección:</strong> {p.direccionentrega ?? "—"}
+                      </span>
+                    </p>
+
+                    <p>
+                      <strong>Total:</strong> ₡{p.total}
+                    </p>
+                  </div>
+
+                  <div className="flex gap-3 mt-3">
+                    <button
+                      onClick={() => marcarEntregado(p)}
+                      disabled={p.estado === "entregado"}
+                      className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-3 py-2 text-sm text-white font-semibold hover:bg-green-700 disabled:opacity-60"
+                    >
+                      <CheckCircle2 className="h-4 w-4" /> Entregado
+                    </button>
+                    <button
+                      onClick={() => cancelarPedido(p)}
+                      disabled={p.estado === "cancelado"}
+                      className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-3 py-2 text-sm text-white font-semibold hover:bg-red-700 disabled:opacity-60"
+                    >
+                      <XCircle className="h-4 w-4" /> Cancelar
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </CardContent>
       </Card>

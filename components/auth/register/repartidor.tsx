@@ -49,7 +49,7 @@ export default function RepartidorRegister() {
     setLoading(true);
 
     try {
-      console.log("🚀 Registrando repartidor con metadata:", {
+      console.log("Registrando repartidor con metadata:", {
         nombre,
         cedula,
         telefono,
@@ -57,7 +57,7 @@ export default function RepartidorRegister() {
         info_vehiculo: infoVehiculo,
         placa,
         zona_reparto: zona,
-        rol: "courier",
+        rol: "repartidor",
       });
 
       const { data, error } = await supabase.auth.signUp({
@@ -73,7 +73,7 @@ export default function RepartidorRegister() {
             info_vehiculo: infoVehiculo,
             placa,
             zona_reparto: zona,
-            rol: "courier", // 👈 muy importante
+            rol: "repartidor", // 👈 muy importante
           },
         },
       });
@@ -89,7 +89,7 @@ export default function RepartidorRegister() {
         setTimeout(() => router.push("/auth/login"), 3000);
       }
     } catch (err: any) {
-      console.error("❌ Error inesperado:", err);
+      console.error(" Error inesperado:", err);
       setErrorMsg("Error inesperado al registrarte. Intenta de nuevo.");
     } finally {
       setLoading(false);

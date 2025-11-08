@@ -51,9 +51,9 @@ export default function LoginForm() {
       case "entrepreneur":
         router.push("/dashboard/emprendedor");
         break;
-      case "admin":
-      case "administrador":
-        router.push("/dashboard/admin");
+      case "repartidor":
+      case "repartidor":
+        router.push("/dashboard/repartidor");
         break;
       default:
         router.push("/dashboard/emprendedor");
