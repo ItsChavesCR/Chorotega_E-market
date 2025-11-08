@@ -1,6 +1,6 @@
 // types/user.ts
 
-export type UserRole = "entrepreneur" | "client" | "courier";
+export type UserRole = "entrepreneur" | "client" | "repartidor";
 
 export interface UserMetadata {
   name?: string;
@@ -8,7 +8,7 @@ export interface UserMetadata {
   address?: string;
   bio?: string;
   avatarUrl?: string | null;
-  role?: "entrepreneur" | "client" | "courier";
+  role?: "entrepreneur" | "client" | "repartidor";
   language?: "es" | "en";
   timezone?: string; 
 };

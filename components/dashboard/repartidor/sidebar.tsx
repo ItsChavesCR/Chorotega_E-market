@@ -19,9 +19,8 @@ type SidebarProps = {
 };
 
 const navItems = [
-  { href: "/dashboard/repartidor", label: "Inicio", icon: LayoutDashboard },
-  { href: "/dashboard/repartidor/orders", label: "Pedidos", icon: ClipboardList },
-  { href: "/dashboard/repartidor/profile", label: "Perfil", icon: UserCircle },
+  { href: "/dashboard/repartidor/orders", label: "Inicio", icon: Home },
+  { href: "/dashboard/repartidor/profile", label: "Perfil", icon: User },
   { href: "/dashboard/repartidor/messages", label: "Mensajes", icon: MessageSquare },
 ];
 

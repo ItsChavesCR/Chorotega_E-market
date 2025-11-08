@@ -10,7 +10,7 @@ import { useNotifications } from "@/hooks/useNotifications";
 
 interface NotificationsProps {
   userId?: string;
-  role: "client" | "entrepreneur" | "courier";
+  role: "client" | "entrepreneur" | "repartidor";
   perfilId?: number;
 }
 
