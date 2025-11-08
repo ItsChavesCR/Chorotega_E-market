@@ -21,7 +21,6 @@ export async function middleware(req: NextRequest) {
     }
   );
 
-  // ✅ Usa getUser() (seguro)
   const { data, error } = await supabase.auth.getUser();
   if (error || !data?.user) {
     console.log("🚫 No hay sesión activa, redirigiendo a login");
@@ -29,37 +28,27 @@ export async function middleware(req: NextRequest) {
   }
 
   const user = data.user;
-  const role = user.user_metadata?.rol || user.user_metadata?.role || "client";
+  const role = user.user_metadata?.rol || "client";
   const path = req.nextUrl.pathname;
 
-  console.log("🧩 Usuario autenticado:", user.email);
-  console.log("🧩 Rol detectado:", role);
-  console.log("🧭 Navegando hacia:", path);
+  const rules: Record<string, string[]> = {
+    client: ["/clientes"],
+    entrepreneur: ["/dashboard/emprendedor"],
+    repartidor: ["/dashboard/repartidor"],
+    admin: ["/dashboard/admin"],
+  };
 
-  // ✅ Guardar el rol en cabecera temporal para que Next no revalide todo
-  res.headers.set("x-user-role", role);
-
-  // --- Rutas por rol ---
-  const isEntrepreneur = path.startsWith("/dashboard/emprendedor");
-  const isCourier = path.startsWith("/dashboard/repartidor");
-  const isClient = path.startsWith("/dashboard/cliente");
-
-  if (isEntrepreneur && role !== "entrepreneur") {
-    return NextResponse.redirect(new URL("/unauthorized", req.url));
-  }
-  if (isCourier && role !== "courier") {
-    return NextResponse.redirect(new URL("/unauthorized", req.url));
-  }
-  if (path.startsWith("/clientes") && role !== "client") {
-    return NextResponse.redirect(new URL("/unauthorized", req.url));
+  for (const [r, routes] of Object.entries(rules)) {
+    if (routes.some((p) => path.startsWith(p)) && r !== role) {
+      console.warn(`❌ Acceso denegado para ${user.email} a ${path}`);
+      return NextResponse.redirect(new URL("/unauthorized", req.url));
+    }
   }
 
   return res;
 }
 
 export const config = {
-  matcher: [
-    "/dashboard/:path*",
-    // opcionalmente podrías agregar más rutas privadas aquí
-  ],
+  matcher: ["/dashboard/:path*", "/clientes/:path*"], // ❌ no incluyas /auth/*
 };
+
